@@ -1,0 +1,128 @@
+---
+title: "VC Data Integrity Tutorial Notes"
+author: "Dr. Greg M. Bernstein"
+toc: true
+number-sections: true
+bibliography: DataIntegrity.bib
+---
+
+# Using Quarto
+
+## Citations and Bibliographies
+
+Supports citations by linking to either [BibTex](https://en.wikipedia.org/wiki/BibTeX) or CSL [Citation Style Language](https://en.wikipedia.org/wiki/Citation_Style_Language) -- used by Zotero. The details on the formats are explained in [PanDoc: specifying bibliographic data](https://pandoc.org/MANUAL.html#specifying-bibliographic-data).
+
+I found a couple of sites that explained how to get BibTex entries for W3C and IETF documents:
+
+* [BibTeX Bibliography of W3C Technical Reports](https://w2.syronex.com/jmr/w3c-biblio) Has a look up based on URL. **Doesn't have latest specs**.
+* [SpecRef](https://www.specref.org/) Looks like they output in CSL JSON? No, their own custom [JSON schema](https://github.com/tobie/specref/blob/main/schemas/raw-reference.json).
+* [IETF Official RFC BibTeX Downloads](https://bushart.org/resource/ietf-bibtexs/) Explains how to get these from IETF. For example for current BBS ID use `https://datatracker.ietf.org/doc/draft-irtf-cfrg-bbs-signatures/bibtex/`
+* [Citation.js](https://citation.js.org/) "Citation.js (GitHub, NPM) converts formats like BibTeX, BibJSON, DOI, and Wikidata to CSL-JSON to convert to styles like APA, Vancouver and to BibTeX and RIS." Has links to file formats.
+* [Wikipedia: DOI](https://en.wikipedia.org/wiki/Digital_object_identifier) *Notes* RFC have DOIs, ID do not.
+* [Wikipedia: ISBN](https://en.wikipedia.org/wiki/ISBN)
+
+I tried creating my own `*.bib` file from individual entries I concatenated. It seems to have worked.
+
+Try citing the VC data model [@Sporny:25:VCD] or the BBS 09 draft [@irtf-cfrg-bbs-signatures-09]. Note that IETF is much more friendly for getting bibliographic data.
+
+## Mermaid Diagrams
+
+From the guide:
+
+```{mermaid}
+flowchart LR
+  A[Hard edge] --> B(Round edge)
+  B --> C{Decision}
+  C --> D[Result one]
+  C --> E[Result two]
+```
+
+Kim's pseudonym diagram
+
+```{mermaid}
+%%{init: {
+    'theme': 'neutral',
+    'themeVariables': {
+        'primaryColor': '#FFFFFF',
+        'primaryTextColor': '#000000',
+        'primaryBorderColor': '#999999',
+        'lineColor': '#666666',
+        'secondaryColor': '#FFFFFF',
+        'tertiaryColor': '#FFFFFF'
+    }
+}}%%
+sequenceDiagram
+    participant P as Prover
+    participant V as Verifier
+
+    rect rgb(239, 239, 239)
+        Note right of P: Credential verification
+    rect rgb(168, 216, 185)
+        P->>P: Generate or receive context_id
+        P->>P: Compute pseudonym = <br>f(nym_secret, context_id)
+    end
+
+    rect rgb(178, 223, 219)
+        P->>V: Send pseudonym + proofs
+        V->>V: Verify proofs and check<br/>context_id
+    end
+    end
+```
+
+
+# Potential Topics/Approaches
+
+## A College/Community Club
+
+A college/community club with a website, loaner equipment for members, events (open to all, open only to members, members paid, etc.)rating system, dues, etc. An example of such a club is the [Cal Sailing Club](https://www.cal-sailing.org/) a university club that morphed into a community club. This *club* will be the [issuer](https://www.w3.org/TR/vc-data-model-2.0/#issuer) and the *member* will be the [credential subject](https://www.w3.org/TR/vc-data-model-2.0/#credential-subject).
+
+Grants credentials... Verifies credentials. One big credential or multiple smaller credentials?
+
+Locations where equipment may be borrowed may have limited connectivity. Also don't want to "phone home" or necessarily track members, except "who broke it" last use type of information... or "exessive use" information.
+
+Can we do better than an easily forgeable paper/plastic card? **Yes**
+
+* Membership credential issuance
+  * Prerequisites: Basic Member information, Emergency Contact, Liability wavers, Dues Paid
+  * Membership credential issued. Dues payment may set the VC's *validFrom* and *validUntil* properties. See [Validity Period](https://www.w3.org/TR/vc-data-model-2.0/#validity-period)
+* Competency Rating credential issuance
+  * These may have a different validity period, may be honored by other affiliated clubs...
+  * Dock etiquet
+  * Equipment setup and take down
+  * Water (tides and currents) and wind conditions knowledge
+  * Wind based Skill Levels
+  * Instructor Skill Levels
+* Equipment checkout verification
+  * Compentency certificate
+  * Dues currently paid
+  * Previously borrowed equipment returned
+
+Can we show workflows? Issue an example credential into a wallet?
+
+* Credential Specification
+  * Developing the "context", standard and custom parts
+  * A single big credential or multiple credentials?
+* Credential Creation and Data Integrity
+  * Credential creation without `proof`
+  * Data Integrity: a general signature mechanism that works with **any** cryptographic signature scheme.
+  * This is initiated by a member and authorized by appropriate club "officers". This would be a club specific workflow which could utilize a call to the VC API to sign a credential.
+* Credential Issuance
+  * Can we make our own website issue a credential into a wallet?
+  * What is this protocol stack? What wallets?
+* Credential Verification
+  * In person verification when taking a competency exam
+  * In person verification when checking out/returning equipment
+  * Automated "locker" access for gear checkout/return
+
+## Proof Sets/Chains and Workflows
+
+Can the new VC API workflow stuff be used to set up signature processes for proof chains and sets? Might this be interesting? Maybe too advanced and not as wide an applicability.
+
+## Previous Presentations and Resources
+
+* [Selective Disclosure for W3C Data Integrity](https://docs.google.com/presentation/d/1d-04kIWhPuNscsAyUuRH3pduqrNerhigCWahKe6SNos/edit?slide=id.g2174b6c9183_0_1364#slide=id.g2174b6c9183_0_1364)
+* [W3C VCWG VC Data Integrity](https://docs.google.com/presentation/d/1a2T1gEuJvgPXsuWaniM8k4jJtu0nbsqsxRGpYrjKzJs/edit?pli=1&slide=id.p#slide=id.p) TPAC 2023.
+* [JSON for Linking Data](https://json-ld.org/)
+* [VC Playground](https://vcplayground.org/)
+
+# References
