@@ -6,75 +6,17 @@ number-sections: true
 bibliography: DataIntegrity.bib
 ---
 
-# Using Quarto
 
-## Citations and Bibliographies
+# Introduction Tutorial Approach
 
-Supports citations by linking to either [BibTex](https://en.wikipedia.org/wiki/BibTeX) or CSL [Citation Style Language](https://en.wikipedia.org/wiki/Citation_Style_Language) -- used by Zotero. The details on the formats are explained in [PanDoc: specifying bibliographic data](https://pandoc.org/MANUAL.html#specifying-bibliographic-data).
+While there are lots of "big use-cases", e.g., drivers licenses, passports, etc., this presentation will look at a smaller and more enjoyable use case of a school or community club that can utilize digital credentials in a useful way.
 
-I found a couple of sites that explained how to get BibTex entries for W3C and IETF documents:
-
-* [BibTeX Bibliography of W3C Technical Reports](https://w2.syronex.com/jmr/w3c-biblio) Has a look up based on URL. **Doesn't have latest specs**.
-* [SpecRef](https://www.specref.org/) Looks like they output in CSL JSON? No, their own custom [JSON schema](https://github.com/tobie/specref/blob/main/schemas/raw-reference.json).
-* [IETF Official RFC BibTeX Downloads](https://bushart.org/resource/ietf-bibtexs/) Explains how to get these from IETF. For example for current BBS ID use `https://datatracker.ietf.org/doc/draft-irtf-cfrg-bbs-signatures/bibtex/`
-* [Citation.js](https://citation.js.org/) "Citation.js (GitHub, NPM) converts formats like BibTeX, BibJSON, DOI, and Wikidata to CSL-JSON to convert to styles like APA, Vancouver and to BibTeX and RIS." Has links to file formats.
-* [Wikipedia: DOI](https://en.wikipedia.org/wiki/Digital_object_identifier) *Notes* RFC have DOIs, ID do not.
-* [Wikipedia: ISBN](https://en.wikipedia.org/wiki/ISBN)
-
-I tried creating my own `*.bib` file from individual entries I concatenated. It seems to have worked.
-
-Try citing the VC data model [@Sporny:25:VCD] or the BBS 09 draft [@irtf-cfrg-bbs-signatures-09]. Note that IETF is much more friendly for getting bibliographic data.
-
-## Mermaid Diagrams
-
-From the guide:
-
-```{mermaid}
-flowchart LR
-  A[Hard edge] --> B(Round edge)
-  B --> C{Decision}
-  C --> D[Result one]
-  C --> E[Result two]
-```
-
-Kim's pseudonym diagram
-
-```{mermaid}
-%%{init: {
-    'theme': 'neutral',
-    'themeVariables': {
-        'primaryColor': '#FFFFFF',
-        'primaryTextColor': '#000000',
-        'primaryBorderColor': '#999999',
-        'lineColor': '#666666',
-        'secondaryColor': '#FFFFFF',
-        'tertiaryColor': '#FFFFFF'
-    }
-}}%%
-sequenceDiagram
-    participant P as Prover
-    participant V as Verifier
-
-    rect rgb(239, 239, 239)
-        Note right of P: Credential verification
-    rect rgb(168, 216, 185)
-        P->>P: Generate or receive context_id
-        P->>P: Compute pseudonym = <br>f(nym_secret, context_id)
-    end
-
-    rect rgb(178, 223, 219)
-        P->>V: Send pseudonym + proofs
-        V->>V: Verify proofs and check<br/>context_id
-    end
-    end
-```
-
-
-# Potential Topics/Approaches
+* [Verifiable credential WG documents](https://www.w3.org/groups/wg/vc/publications/)
+* [Credentials Community Group](https://www.w3.org/groups/cg/credentials/)
 
 ## A College/Community Club
 
-A college/community club with a website, loaner equipment for members, events (open to all, open only to members, members paid, etc.)rating system, dues, etc. An example of such a club is the [Cal Sailing Club](https://www.cal-sailing.org/) a university club that morphed into a community club. This *club* will be the [issuer](https://www.w3.org/TR/vc-data-model-2.0/#issuer) and the *member* will be the [credential subject](https://www.w3.org/TR/vc-data-model-2.0/#credential-subject).
+A college/community club with a website, loaner equipment for members, events (open to all, open only to members, members paid, etc.), rating system, dues, etc. An example of such a club is the [Cal Sailing Club](https://www.cal-sailing.org/) a university club that morphed into a community club. This *club* will be the [issuer](https://www.w3.org/TR/vc-data-model-2.0/#issuer) and the *member* will be the [credential subject](https://www.w3.org/TR/vc-data-model-2.0/#credential-subject). The *club* will also be the prime verifier.
 
 Grants credentials... Verifies credentials. One big credential or multiple smaller credentials?
 
@@ -100,23 +42,20 @@ Can we do better than an easily forgeable paper/plastic card? **Yes**
 Can we show workflows? Issue an example credential into a wallet?
 
 * Credential Specification
-  * Developing the "context", standard and custom parts
+  * Developing the "context", standard and custom parts **Will Show**
   * A single big credential or multiple credentials?
-* Credential Creation and Data Integrity
+* Credential Creation and Data Integrity **Will Show**
   * Credential creation without `proof`
   * Data Integrity: a general signature mechanism that works with **any** cryptographic signature scheme.
+  * Signature cryptosuite selection **A slide or two**
   * This is initiated by a member and authorized by appropriate club "officers". This would be a club specific workflow which could utilize a call to the VC API to sign a credential.
 * Credential Issuance
-  * Can we make our own website issue a credential into a wallet?
-  * What is this protocol stack? What wallets?
+  * Can we make our own website issue a credential into a wallet? *Issue here is wallets that work with VCs* I didn't see any simple VC wallets for Android. **Will not show**
+  * What is this protocol stack? What wallets? [Info on CHAPI](https://vcplayground.org/docs/)
 * Credential Verification
   * In person verification when taking a competency exam
   * In person verification when checking out/returning equipment
   * Automated "locker" access for gear checkout/return
-
-## Proof Sets/Chains and Workflows
-
-Can the new VC API workflow stuff be used to set up signature processes for proof chains and sets? Might this be interesting? Maybe too advanced and not as wide an applicability.
 
 ## Previous Presentations and Resources
 
@@ -124,5 +63,82 @@ Can the new VC API workflow stuff be used to set up signature processes for proo
 * [W3C VCWG VC Data Integrity](https://docs.google.com/presentation/d/1a2T1gEuJvgPXsuWaniM8k4jJtu0nbsqsxRGpYrjKzJs/edit?pli=1&slide=id.p#slide=id.p) TPAC 2023.
 * [JSON for Linking Data](https://json-ld.org/)
 * [VC Playground](https://vcplayground.org/)
+
+
+# Club Credential Specification
+
+See file `/home/greg/Greg_Work/SecurityPrivacy/JSONLD-Test/FoilingCreds.md` for content ideas.
+
+VC Data Model 2.0 [@VC-DM2.0] -- "This specification uses JSON-LD 1.1 to serialize the data model",
+
+
+Choices: *embedded proof* (Data Integrity 1.0) or *enveloping proof*
+
+, JSON and JSON-LD, Contexts
+
+## JSON Everywhere
+
+My Notes: When teaching "web developement" to CS majors there is so much material to be covered need to reduce the cognitive load. I would choose to use JavaScript on the server since students would need to learn JavaScript for the browser. JavaScript contains an easy to use subset that can be used to express nearly arbitrary data structures. This is JSON.
+
+* [JSON](https://www.json.org/json-en.html) Simple, easy, data interoperability, across many languages. Data "lingua franca" for the web. I would teach this early (week 4) on in a first web dev class for CS majors [JSON Slides](https://www.grotto-networking.com/WebsiteDevelopment/files/lectures/Misc/JSON.html#/title-slide).
+* [JSON-Schema](https://json-schema.org/) "JSON Schema is a declarative language for annotating and validating JSON documents' structure, constraints, and data types." Would teach this in a second web development course for use in data validation. [JSON-Schema Slides](https://www.grotto-networking.com/WebsiteDevelopment/files/lectures/Misc/JSON-Schema.html)  Would have my students use [npm: AJV](https://www.npmjs.com/package/ajv). I use AJV for initial credential validation in my [VC interoperability test server](https://github.com/Wind4Greg/Server-for-VCs)
+* [RFC6901 JavaScript Object Notation (JSON) Pointer](https://www.rfc-editor.org/rfc/rfc6901),April 2013, "JSON Pointer defines a string syntax for identifying a specific value within a JavaScript Object Notation (JSON) document.", Only 8 pages.
+* [RFC 8785 JSON Canonicalization Scheme (JCS)](https://www.rfc-editor.org/rfc/rfc8785), June 2020. "Cryptographic operations like hashing and signing need the data to be expressed in an invariant format so that the operations are reliably repeatable. One way to address this is to create a canonical representation of the data."
+
+Example: Popularity of JSON-Schema and AJV
+
+![AJV at NPM](AJV-JSON-Schema.png)
+
+## JSON-LD (What Does it Add?)
+
+JSON-LD 1.1 [@JSON-LD-1.1] Abstract: "JSON is a useful data serialization and messaging format. This specification defines JSON-LD 1.1, a JSON-based format to serialize Linked Data. The syntax is designed to easily integrate into deployed systems that already use JSON, and provides a smooth upgrade path from JSON to JSON-LD. It is primarily intended to be a way to use Linked Data in Web-based programming environments, to build interoperable Web services, and to store Linked Data in JSON-based storage engines."
+
+"In addition to all the features JSON provides, JSON-LD introduces:"
+
+* a universal identifier mechanism for JSON objects via the use of IRIs,
+* a way to disambiguate keys shared among different JSON documents by mapping them to IRIs via a **context**,
+* a mechanism in which a value in a JSON object may refer to a resource on a different site on the Web,
+* the ability to annotate strings with their language,
+* a way to associate datatypes with values such as dates and times,
+* and a facility to express one or more directed graphs, such as a social network, in a single document.
+
+**Question**: Which of these are used in VCs? How are these different from JSON-Schema capabilities?
+
+RDF Canonicalization [@RDF-Canon]
+
+**Abstract**:  "RDF [RDF11-CONCEPTS] describes a graph-based data model for making claims about the world and provides the foundation for reasoning upon that graph of information. At times, it becomes necessary to compare the differences between sets of graphs, digitally sign them, or generate short identifiers for graphs via hashing algorithms. This document outlines an algorithm for normalizing RDF datasets such that these operations can be performed."
+
+**Why?** Selective Disclosure!!! Want an ordered set of statements that can be selectively revealed. Need the additional algorithms from selective disclosure portion of ECDSA-SD spec.
+
+
+
+# Club Credential Workflow
+
+## Credential Creation
+
+# Club Credential Issuance
+
+## Signing Credentials via Data Integrity
+
+**Which cryptosuite and why?**
+
+## Transfer to Holder via CHAPI
+
+### Wallets and Such
+
+Although there are tons of crypto wallets out there, there doesn't seem to be many general purpose wallets for credentials. Most have virtually no documentation about what standards they implement for transfer or credential format. A few with some info are listed below.
+
+* [Veres Wallet](https://demo.vereswallet.dev/) "Stores any credential that can be stored in a physical wallet. Cloud-based digital wallet that cannot be lost or stolen. Access your credentials from all of your devices"
+* [Learner Credential Wallet](https://play.google.com/store/apps/details?id=app.lcw) "Learner Credential Wallet is a cross-platform mobile application for storing and sharing digital learner credentials as specified in the learner credential wallet specification developed by the Digital Credentials Consortium. The learner credential wallet specification is based on the draft W3C Universal Wallet interoperability specification and the draft W3C Verifiable Credentials data model."
+* [CA DMV Wallet](https://play.google.com/store/apps/details?id=gov.ca.dmv.wallet) Specific to CA DMV.
+
+Specifications and such:
+
+* [CCG: Universal Wallet 2020](https://w3c-ccg.github.io/universal-wallet-interop-spec/) "This specification describes a portable, extensible, JSON-LD wallet representation, supporting digital currencies and credentials." Last updated 2023.
+* [OpenWallet Foundation](https://openwallet.foundation/)
+
+# Verification for Events and Equipment Checkout
+
+
 
 # References

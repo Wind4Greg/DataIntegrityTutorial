@@ -1,0 +1,71 @@
+---
+title: "Quarto Notes"
+author: "Dr. Greg M. Bernstein"
+toc: true
+number-sections: true
+bibliography: DataIntegrity.bib
+---
+
+# Using Quarto
+
+## Citations and Bibliographies
+
+Supports citations by linking to either [BibTex](https://en.wikipedia.org/wiki/BibTeX) or CSL [Citation Style Language](https://en.wikipedia.org/wiki/Citation_Style_Language) -- used by Zotero. The details on the formats are explained in [PanDoc: specifying bibliographic data](https://pandoc.org/MANUAL.html#specifying-bibliographic-data).
+
+I found a couple of sites that explained how to get BibTex entries for W3C and IETF documents:
+
+* [BibTeX Bibliography of W3C Technical Reports](https://w2.syronex.com/jmr/w3c-biblio) Has a look up based on URL. **Doesn't have latest specs**.
+* [SpecRef](https://www.specref.org/) Looks like they output in CSL JSON? No, their own custom [JSON schema](https://github.com/tobie/specref/blob/main/schemas/raw-reference.json).
+* [IETF Official RFC BibTeX Downloads](https://bushart.org/resource/ietf-bibtexs/) Explains how to get these from IETF. For example for current BBS ID use `https://datatracker.ietf.org/doc/draft-irtf-cfrg-bbs-signatures/bibtex/`
+* [Citation.js](https://citation.js.org/) "Citation.js (GitHub, NPM) converts formats like BibTeX, BibJSON, DOI, and Wikidata to CSL-JSON to convert to styles like APA, Vancouver and to BibTeX and RIS." Has links to file formats.
+* [Wikipedia: DOI](https://en.wikipedia.org/wiki/Digital_object_identifier) *Notes* RFC have DOIs, ID do not.
+* [Wikipedia: ISBN](https://en.wikipedia.org/wiki/ISBN)
+
+I tried creating my own `*.bib` file from individual entries I concatenated. It seems to have worked.
+
+Try citing the VC data model [@Sporny:25:VCD] or the BBS 09 draft [@irtf-cfrg-bbs-signatures-09]. Note that IETF is much more friendly for getting bibliographic data.
+
+## Mermaid Diagrams
+
+From the guide:
+
+```{mermaid}
+flowchart LR
+  A[Hard edge] --> B(Round edge)
+  B --> C{Decision}
+  C --> D[Result one]
+  C --> E[Result two]
+```
+
+Kim's pseudonym diagram
+
+```{mermaid}
+%%{init: {
+    'theme': 'neutral',
+    'themeVariables': {
+        'primaryColor': '#FFFFFF',
+        'primaryTextColor': '#000000',
+        'primaryBorderColor': '#999999',
+        'lineColor': '#666666',
+        'secondaryColor': '#FFFFFF',
+        'tertiaryColor': '#FFFFFF'
+    }
+}}%%
+sequenceDiagram
+    participant P as Prover
+    participant V as Verifier
+
+    rect rgb(239, 239, 239)
+        Note right of P: Credential verification
+    rect rgb(168, 216, 185)
+        P->>P: Generate or receive context_id
+        P->>P: Compute pseudonym = <br>f(nym_secret, context_id)
+    end
+
+    rect rgb(178, 223, 219)
+        P->>V: Send pseudonym + proofs
+        V->>V: Verify proofs and check<br/>context_id
+    end
+    end
+```
+
