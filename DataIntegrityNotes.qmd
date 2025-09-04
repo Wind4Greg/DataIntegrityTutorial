@@ -14,6 +14,13 @@ While there are lots of "big use-cases", e.g., drivers licenses, passports, etc.
 * [Verifiable credential WG documents](https://www.w3.org/groups/wg/vc/publications/)
 * [Credentials Community Group](https://www.w3.org/groups/cg/credentials/)
 
+## TODOs and Ideas
+
+* What kind of DID to use? For the club. Do we need one for the member? I don't think so.
+* Other contexts that could be used "open badges", "CLR"... but we are rolling our own
+* Choosing a cryptosuite. Decision tree.
+
+
 ## A College/Community Club
 
 A college/community club with a website, loaner equipment for members, events (open to all, open only to members, members paid, etc.), rating system, dues, etc. An example of such a club is the [Cal Sailing Club](https://www.cal-sailing.org/) a university club that morphed into a community club. This *club* will be the [issuer](https://www.w3.org/TR/vc-data-model-2.0/#issuer) and the *member* will be the [credential subject](https://www.w3.org/TR/vc-data-model-2.0/#credential-subject). The *club* will also be the prime verifier.
@@ -133,7 +140,7 @@ The minimal example from VC DM 2.0:
 ```json
 {
   "@context": [
-    "https://www.w3.org/ns/credentials/v2",
+    "https://www.w3.org/ns/credentials/v2", // Includes DataIntegrityProof
     "https://www.w3.org/ns/credentials/examples/v2"
   ],
   "type": ["VerifiableCredential", "MyPrototypeCredential"],
@@ -169,6 +176,39 @@ Useful additional fields from VC DM 2.0:
 }
 ```
 
+### Data Integrity 1.0 *proof*
+
+A summary of the ***proof*** field from data integrity 1.0 document is given below. The *proof* field object without the *proofValue* entry is used as the "proof options" is used as the input to many of the cryptosuites.
+
+```javascript
+{
+  // required fields
+  "type": "DataIntegrityProof", // Only. We are using the DI 1.0 spec
+  "proofPurpose": "assertionMethod", // Use this value for VCs
+  "cryptosuite": "One of official cryptosuite names", // We will discuss how to pick
+  "verificationMethod": "points to issuer public key, either did:key or ",
+  "proofValue": "Cryptographic value computed by the cryptosuite",
+  // optional fields
+  "created": "", // applies to proof not credential
+  "expires": "", // applies to proof
+  "id": "", // id of the proof
+  "domain": "we will not use",
+  "challenge": "we will not use",
+  "previousProof": "we will not use", // for proof sets or chains
+  "nonce": "we will not use"
+}
+
+```
+
+For the *verificationMethod* we use a DID to map to the issuers public key. There are many "DID methods" from the point of view of our club which is has a web site implementation we will consider using "did:key", "did:web", and "did:webvh".
+
+* [DID Methods: Known DID Methods in the Decentralized Identifier Ecosystem](https://www.w3.org/TR/did-extensions-methods/)
+* [The did:key Method v0.7](https://w3c-ccg.github.io/did-key-spec/) Use for development easy to pass around the public key for the cryptosuite.
+* [did:web Method Specification](https://w3c-ccg.github.io/did-method-web/) Use for deployment since club already has a website.
+* [The did:webvh DID Method v1.0](https://identity.foundation/didwebvh/v1.0/) More features than "did:web" can use for deployment since club already has a website.
+* Current possible values for the *cryptosuite* field: "ecdsa-sd-2023", "bbs-2023", "ecdsa-jcs-2019", "ecdsa-rdfc-2019", "eddsa-jcs-2022", and "eddsa-rdfc-2022".
+
+
 ## Context Creation
 
 Example from ECDSA-SD test vectors:
@@ -191,6 +231,15 @@ export const windSDexamples = {
 }
 ```
 
+The credentials for our club will be broken down into three groups:
+
+* member status (dues paid, etc...), [alumni example](https://www.w3.org/TR/vc-data-model-2.0/#example-use-of-the-context-property)
+* knowledge certifications: a set of specific knowledge demonstrated
+* skill certifications: a set of specific skills demonstrated
+
+Complete specifications in the education area: [Open Badges Overview](https://www.1edtech.org/standards/open-badges), [Open Badges Specification Spec Version 3.0](https://www.imsglobal.org/spec/ob/v3p0/)-- based on VC DM 2.0 --  and [Comprehensive Learner Record Standard Spec Version 2.0 ](https://www.imsglobal.org/spec/clr/v2p0) this features a list of "achievements".
+
+Note that the CLR 2.0 *context* uses `"@container": "@set"` for its `achievement` field, i.e., multiple "achievements" while in Open Badges 3.0 you get one acheivement.
 
 
 # Club Credential Workflow
