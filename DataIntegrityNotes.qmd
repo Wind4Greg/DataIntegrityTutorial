@@ -9,7 +9,7 @@ bibliography: DataIntegrity.bib
 
 # Introduction Tutorial Approach
 
-While there are lots of "big use-cases", e.g., drivers licenses, passports, etc., this presentation will look at a smaller and more enjoyable use case of a school or community club that can utilize digital credentials in a useful way.
+While there are lots of "big use-cases", e.g., drivers licenses, passports, etc., this presentation will look at a smaller and more enjoyable use case of a school or community club that can utilize digital credentials in a useful way. This puts us our application in the non-profit and non-governmental category.
 
 * [Verifiable credential WG documents](https://www.w3.org/groups/wg/vc/publications/)
 * [Credentials Community Group](https://www.w3.org/groups/cg/credentials/)
@@ -21,13 +21,13 @@ While there are lots of "big use-cases", e.g., drivers licenses, passports, etc.
 * Choosing a cryptosuite. Decision tree.
 
 
-## A College/Community Club
+## A School/Community Club
 
-A college/community club with a website, loaner equipment for members, events (open to all, open only to members, members paid, etc.), rating system, dues, etc. An example of such a club is the [Cal Sailing Club](https://www.cal-sailing.org/) a university club that morphed into a community club. This *club* will be the [issuer](https://www.w3.org/TR/vc-data-model-2.0/#issuer) and the *member* will be the [credential subject](https://www.w3.org/TR/vc-data-model-2.0/#credential-subject). The *club* will also be the prime verifier.
+A school/community club with a website, loaner equipment for members, events (open to all, open only to members, members paid, etc.), rating system, dues, etc. An example of such a club is the [Cal Sailing Club](https://www.cal-sailing.org/) a university club that morphed into a community club. This *club* will be the [issuer](https://www.w3.org/TR/vc-data-model-2.0/#issuer) and the *member* will be the [credential subject](https://www.w3.org/TR/vc-data-model-2.0/#credential-subject). The *club* will also be the prime verifier.
 
 Grants credentials... Verifies credentials. One big credential or multiple smaller credentials?
 
-Locations where equipment may be borrowed may have limited connectivity. Also don't want to "phone home" or necessarily track members, except "who broke it" last use type of information... or "exessive use" information.
+Locations where equipment may be borrowed may have limited connectivity. Also don't want to "phone home" or necessarily track members, except "who broke it" last use type of information... or "exessive use" information. But where credentials become particularly valuable is when different clubs in from different schools/communities wish some form of cooperation allowing members some type of reciprocal priveledges based on a verifiable credential.
 
 Can we do better than an easily forgeable paper/plastic card? **Yes**
 
@@ -53,13 +53,16 @@ Can we show workflows? Issue an example credential into a wallet?
   * A single big credential or multiple credentials?
 * Credential Creation and Data Integrity **Will Show**
   * Credential creation without `proof`
+  * Specification of DI "proof options"
   * Data Integrity: a general signature mechanism that works with **any** cryptographic signature scheme.
   * Signature cryptosuite selection **A slide or two**
   * This is initiated by a member and authorized by appropriate club "officers". This would be a club specific workflow which could utilize a call to the VC API to sign a credential.
 * Credential Issuance
+  * Key management: simple and what folks do in larger. What about the public key -> (DID)
   * Can we make our own website issue a credential into a wallet? *Issue here is wallets that work with VCs* I didn't see any simple VC wallets for Android. **Will not show**
   * What is this protocol stack? What wallets? [Info on CHAPI](https://vcplayground.org/docs/)
 * Credential Verification
+  * Resolving the public key of the issuer via a DID
   * In person verification when taking a competency exam
   * In person verification when checking out/returning equipment
   * Automated "locker" access for gear checkout/return

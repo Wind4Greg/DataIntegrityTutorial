@@ -1,6 +1,6 @@
 # Verifiable Credentials Data Integrity Tutorial
 
-This tutorial aims to explain and demonstrate the use of verifiable credentials between small organizations.
+This tutorial aims to explain and demonstrate the use of verifiable credentials between small non-profit, non-governmental organizations.
 
 It focuses on the following topics:
 
@@ -11,7 +11,7 @@ It focuses on the following topics:
 
 If you have questions or would like to contribute. Drop me a note or post an issue.
 
-## Example Application: A School Club
+## Example Application: A School/Community Club
 
 When teaching begining and intermediate website development to computer science majors one of the authors of this tutorial would have students create a website for a real or fictional school or community club, such as a hiking club, a guitar club, a cooking club etc... They would develop this website from a simple static HTML page to a full front-end/back-end server based application with logins for club members and club officers with different views and club management capabilities based on membership/officer status.
 
@@ -23,7 +23,8 @@ Now if hiking clubs at two or more different schools (or communities) wish to co
 
 I like to start most writing assignments by taking lots of notes and putting down lots of ideas. These are in the [DataIntegrityNotes.qmd](DataIntegrityNotes.qmd) file. I also prefer to work in Markdown. As an experiment I'm trying to use the [Quarto scientific/technical publishing system](https://quarto.org/) which utilizes Markdown and [Pandoc](https://pandoc.org/). Note that code examples, if any, will be in JavaScript for [Node.js](https://nodejs.org/en) as all the test vectors for the various Data Integrity cryptosuites that I generated were produced with JavaScript and also the test servers that I wrote to participate in the VC interoperability tests.
 
-
 ## Standards Covered
+
+
 
 ## Technology Utilized

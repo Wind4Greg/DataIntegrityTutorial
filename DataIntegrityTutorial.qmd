@@ -1,0 +1,60 @@
+---
+title: "VC Data Integrity Tutorial"
+author: "Dr. Greg M. Bernstein and others?"
+toc: true
+number-sections: true
+bibliography: DataIntegrity.bib
+---
+
+# Introduction
+
+This document provides a tutorial introduction to W3C verifiable credentials to allow non-profit school or community clubs to cooperate with each in a timely and privacy enhancing way via the issuance and verification of *verifiable credentials*. We will illustrating the use of the following W3C **specifications**:
+
+* Verifiable Credential Data Model 2.0 [@VC-DM2.0]
+* Verifiable Credential Data Integrity 1.0 [@VC-DI1.0]
+* JSON-LD-1.1 [@JSON-LD-1.1]
+
+In addition we will go through the decision process in selecting the appropriate **cryptosuite** from among:
+
+* Data Integrity EdDSA Cryptosuites v1.0 [@VC-DI-EdDSA]
+* Data Integrity ECDSA Cryptosuites v1.0 [@VC-DI-ECDSA]
+
+## Cooperating School/Communition Clubs Use Case
+
+# Club Credential Specification
+
+## Club Specific Domain Knowledge
+
+## JSON Everywhere!
+
+**JSON**, **JSON Schema**, and **JSON-LD** What does each bring to the table and how much are they really used (alot!)
+
+## Structure and Fields from the VC Data Model 2.0
+
+## Additional Structure and Fields from Data Integrity 1.0
+
+**Important** this also sets up the "proof options" that are used by the DI cryptosuites.
+
+## Creating the Club Specific `@context`
+
+# Signatures, Keys, and Cryptosuites, oh my!
+
+## Choosing a Cryptosuite
+
+Basic review of digital signatures, public key cryptography. Concerned with forgeries!
+
+## Dealing with Cryptographic Keys
+
+### Private keys
+
+These need to be **protected**! There is a wide range of approaches...
+
+### Public keys (DIDs)
+
+This needs to be made available in a "secure maner", don't want a malicious party to substitute in their public key and *impersonate* the real issuer.
+
+# Credential Issuance
+
+# Credential Verification
+
+# References
