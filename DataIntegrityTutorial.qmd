@@ -19,7 +19,19 @@ In addition we will go through the decision process in selecting the appropriate
 * Data Integrity EdDSA Cryptosuites v1.0 [@VC-DI-EdDSA]
 * Data Integrity ECDSA Cryptosuites v1.0 [@VC-DI-ECDSA]
 
-## Cooperating School/Communition Clubs Use Case
+## Cooperating School/Community Clubs Use Case
+
+Suppose that we have two community hiking clubs (purely fictitious): *The Arcata Tall Trees Hiking Club* and the *White Mountain Old Trees Hiking Club* as shown below. Both clubs exists to promote the "great outdoors", hiking safety, and comraderie.
+
+![The tallest trees (Coast Redwoods)](CoastRedwoord.jpg) ![The oldest trees (Bristlecone pine)](BristleconePine.jpg)
+
+When teaching begining and intermediate website development to computer science majors one of the authors of this tutorial would have students create a website for a real or fictional school or community club of their choosing, such as a hiking club, a guitar club, a cooking club etc... They would develop this website from a simple static HTML page to a full front-end/back-end server based application with logins for club members and club officers with different views and club management capabilities based on membership/officer status. A partially complete example club is the [Bay Area Windsurf Foiling Club](https://bawfc.grotto-networking.com/index.html). This tutorial goes one step further and adds the ability to issue verifiable credentials to its members so that they can participate in someway with a different club that has some kind of reciprocity agreement.
+
+To make the club interesting from a credential perspective the club should certify knowledge or skills of a member. We assume the club has a website and member data base of some sort. Clubs can get quite elaborate with loaner equipment for members, events (open to all, open only to members, members paid, etc.), rating system, required volunteer work, etc. An example of such a club is the [Cal Sailing Club](https://www.cal-sailing.org/) a university club that morphed into a community club which has an extensive training program, collection of boats and windsurfers, and runs a number of events every year.
+
+### Why Bother with Verifiable Credentials?
+
+Hiking club example. Member status. Knowledge certification. Skills certification. Each club has separate member databases which for privacy reasons do not share with the other club. If only a single club then a "hike leader" could check the club database. Other mechanisms could include one club sending email to another or calling the other. These are not as timely as a current credential and sacrifice privacy. "Now we know that he/she is participating with that other club..."
 
 # Club Credential Specification
 
