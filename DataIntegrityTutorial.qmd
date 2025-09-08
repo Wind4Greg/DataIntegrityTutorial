@@ -37,9 +37,149 @@ Hiking club example. Member status. Knowledge certification. Skills certificatio
 
 ## Club Specific Domain Knowledge
 
-## JSON Everywhere!
+## JSON for Everything!
 
-**JSON**, **JSON Schema**, and **JSON-LD** What does each bring to the table and how much are they really used (alot!)
+### Data Modeling and Exchange: JSON
+
+[JSON](https://www.json.org/json-en.html):
+
+> JSON (JavaScript Object Notation) is a lightweight data-interchange format. It is easy for humans to read and write. It is easy for machines to parse and generate. It is based on a subset of the JavaScript Programming Language Standard ECMA-262 3rd Edition - December 1999. JSON is a text format that is completely language independent but uses conventions that are familiar to programmers of the C-family of languages, including C, C++, C#, Java, JavaScript, Perl, Python, and many others. These properties make JSON an ideal data-interchange language.
+
+JSON is the text based data "lingua franca" for the web. I would teach this early (week 4) in a first web programming class for CS majors. See [JSON Slides](https://www.grotto-networking.com/WebsiteDevelopment/files/lectures/Misc/JSON.html#/title-slide).
+
+Example of an JSON based credential from [@VC-DM2.0]:
+
+```javascript
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://www.w3.org/ns/credentials/examples/v2"
+  ],
+  "id": "http://university.example/credentials/58473",
+  "type": ["VerifiableCredential", "ExampleAlumniCredential"],
+  "issuer": "did:example:2g55q912ec3476eba2l9812ecbfe",
+  "validFrom": "2010-01-01T00:00:00Z",
+  "credentialSubject": {
+    "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+    "alumniOf": {
+      "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
+      "name": "Example University"
+    }
+  }
+}
+```
+
+### Data Validation: JSON-Schema
+
+JSON is great for modeling almost any data structure imaginable. However what if your application only wants certain types of data in a particular format, i.e., a small subset of possible JSON structures and content. Typically the structure and type of data is specified by a ***schema*** of some kind.
+
+From [JSON-Schema](https://json-schema.org/):
+
+> While JSON is probably the most popular format for exchanging data, JSON Schema is the vocabulary that enables JSON data consistency, validity, and interoperability at scale.
+> JSON Schema is a declarative language for annotating and validating JSON documents' structure, constraints, and data types
+
+In addition a JSON-Schema is specified via JSON! I Would teach this in a second web development course for use in data validation. [JSON-Schema Slides](https://www.grotto-networking.com/WebsiteDevelopment/files/lectures/Misc/JSON-Schema.html).
+
+I use JSON-Scheme in multiple places in my open source [VC interoperability test server](https://github.com/Wind4Greg/Server-for-VCs). Below is an example that does some basic checks on a credential:
+
+```javascript
+{
+     "$id": "https://grotto-networking.com/simple-credential.schema.json",
+     "title": "UnsignedCredential",
+     "description": "A basic credential validator, data model v1.1 or v2.0",
+     "type": "object",
+     "properties": {
+          "@context": {
+               "type": "array",
+               "items": {
+                    "type": ["string", "object"]
+               }
+          },
+          "id": {
+               "type": "string",
+               "format": "uri"
+          },
+          "type": {
+               "type": ["string", "array"]
+          },
+          "credentialSubject": {
+               "type": ["object", "array"]
+          },
+          "issuer": {
+               "anyOf": [
+                    {
+                         "type": "string",
+                         "format": "uri"
+                    },
+                    {
+                         "type": "object",
+                         "properties": {
+                              "id": {
+                                   "type": "string",
+                                   "format": "uri"
+                              }
+                         },
+                         "required": ["id"]
+                    }
+               ]
+          },
+          "credentialStatus": {
+               "type": "object",
+               "properties": {
+                    "id": {
+                         "type": "string",
+                         "format": "uri"
+                    },
+                    "type": {
+                         "type": ["string", "array"]
+                    }
+               },
+               "required": ["type"]
+          }
+     },
+     "required": ["@context", "type", "credentialSubject", "issuer"]
+}
+```
+
+To actually perform checks of JSON document against a JSON-Schema optimized code libraries are used. I use and would have my students use [npm: AJV](https://www.npmjs.com/package/ajv). In the figure below we show the [NPM](https://www.npmjs.com/package/ajv) page for AJV, as you can see from the weekly download numbers (100M+) JSON-Schema for input validation is extremely popular.
+
+![AJV NPM page](AJV-JSON-Schema.png)
+
+### But What Does it mean: JSON-LD
+
+From [@JSON-LD-1.1]: In addition to all the features JSON provides, JSON-LD introduces:
+
+* a universal identifier mechanism for JSON objects via the use of IRIs,
+* a way to disambiguate *keys* shared among different JSON documents by mapping them to IRIs via a **context**,
+* a mechanism in which a value in a JSON object may refer to a resource on a different site on the Web,
+* the ability to annotate strings with their language,
+* a way to associate datatypes with values such as dates and times,
+* and a facility to express one or more directed graphs, such as a social network, in a single document.
+
+Let's focus on the second bullet "a way to disambiguate keys". Consider the following (invalid) credential for a "mystery club":
+
+```javascript
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://www.MysteryClub.org/ns/credentials"
+  ],
+  "id": "http://university.example/credentials/58473",
+  "type": ["VerifiableCredential", "MysteryClubEquipmentCredential"],
+  "issuer": "did:example:2g55q912ec3476eba2l9812ecbfe",
+  "validFrom": "2010-01-01T00:00:00Z",
+  "credentialSubject": {
+    "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+    "equipment": {
+      "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
+      "poles": "Some kind of pole"
+    }
+  }
+}
+```
+
+From the above we see that "mystery club" has issued a credential about *equipment* to a *credential subject*. We see that subject has a key denoted *poles*. But what does this mean? (a) hiking poles, (b) treking poles, (c) spinaker pole, (d) poles for pole-vaulting, (e) alpine ski poles, (f) cross country ski poles, (g) gondolier pole, etc... What we are missing is *context*!
+
 
 ## Structure and Fields from the VC Data Model 2.0
 
