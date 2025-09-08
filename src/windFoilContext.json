@@ -1,0 +1,5 @@
+{
+  "@context": {
+    "membership": "http://bawfc.grotto-networking.com/cred#membership"
+  }
+}
