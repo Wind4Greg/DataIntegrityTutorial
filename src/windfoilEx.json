@@ -3,7 +3,7 @@
     "https://www.w3.org/ns/credentials/v2",
     "https://bawfc.grotto-networking.com/credentials"
   ],
-  "name": "Bay Area Windsurf Foiling Credential",
+ "name": "Bay Area Windsurf Foiling Credential",
   "description": "Denotes membership, knowledge, and skills in windsurf foiling",
   "type": ["VerifiableCredential", "WindFoilCredential"],
   "issuer": {
@@ -21,11 +21,11 @@
         {"topic": "LandMarksBuoys", "date": "2010-01-01T00:00:00Z"},
         {"topic": "BigBoatsFerries", "date": "2010-01-01T00:00:00Z"}
     ],
-    "skills": [{"name": "Rigging", "date":"2010-01-01T00:00:00Z"},
-        {"name": "FoilSetup", "date": "2017-01-01T00:00:00Z"}
+    "skills": [{"skill": "Rigging", "date":"2010-01-01T00:00:00Z"},
+        {"skill": "FoilSetup", "date": "2017-01-01T00:00:00Z"}
     ],
-    "distanceAchiements": [{"name": "TI", "date": "2010-01-01T00:00:00Z"},
-        {"name": "R2", "date": "2011-01-01T00:00:00Z"}
+    "distanceAchiements": [{"landmark": "TI", "date": "2010-01-01T00:00:00Z"},
+        {"landmark": "R2", "date": "2011-01-01T00:00:00Z"}
     ]
   }
 }
