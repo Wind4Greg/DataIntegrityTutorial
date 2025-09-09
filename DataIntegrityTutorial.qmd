@@ -82,9 +82,9 @@ Now there are also a number of things a club might need to know about you that d
 
 JSON is the text based data "lingua franca" for the web. I would teach this early (week 4) in a first web programming class for CS majors. See [JSON Slides](https://www.grotto-networking.com/WebsiteDevelopment/files/lectures/Misc/JSON.html#/title-slide).
 
-Example of an JSON based credential from [@VC-DM2.0]:
+@lst-JSONVC is an example of an JSON based credential from [@VC-DM2.0]:
 
-```javascript
+```{#lst-JSONVC .javascript lst-cap="Simple verifiable credential in JSON format."}
 {
   "@context": [
     "https://www.w3.org/ns/credentials/v2",
@@ -115,9 +115,9 @@ From [JSON-Schema](https://json-schema.org/):
 
 In addition a JSON-Schema is specified via JSON! I Would teach this in a second web development course for use in data validation. [JSON-Schema Slides](https://www.grotto-networking.com/WebsiteDevelopment/files/lectures/Misc/JSON-Schema.html).
 
-I use JSON-Scheme in multiple places in my open source [VC interoperability test server](https://github.com/Wind4Greg/Server-for-VCs). Below is an example that does some basic checks on a credential:
+I use JSON-Scheme in multiple places in my open source [VC interoperability test server](https://github.com/Wind4Greg/Server-for-VCs). @lst-Schema shows an example that does some basic checks on a verifiable credential.
 
-```javascript
+```{#lst-Schema .javascript lst-cap="Basic Schema to check a credential."}
 {
      "$id": "https://grotto-networking.com/simple-credential.schema.json",
      "title": "UnsignedCredential",
@@ -191,9 +191,9 @@ From [@JSON-LD-1.1]: In addition to all the features JSON provides, JSON-LD intr
 * a way to associate datatypes with values such as dates and times,
 * and a facility to express one or more directed graphs, such as a social network, in a single document.
 
-Let's focus on the second bullet "a way to disambiguate keys". Consider the following (invalid) credential for a "mystery club":
+Let's focus on the second bullet "a way to disambiguate keys". Consider the credential for a "mystery club" shown in @lst-Poles.
 
-```javascript
+```{#lst-Poles .javascript lst-cap="What kind of poles?"}
 {
   "@context": [
     "https://www.w3.org/ns/credentials/v2",
@@ -213,8 +213,7 @@ Let's focus on the second bullet "a way to disambiguate keys". Consider the foll
 }
 ```
 
-From the above we see that "mystery club" has issued a credential about *equipment* to a *credential subject*. We see that subject has a key denoted *poles*. But what does this mean? (a) hiking poles, (b) treking poles, (c) spinaker pole, (d) poles for pole-vaulting, (e) alpine ski poles, (f) cross country ski poles, (g) gondolier pole, etc... What we are missing is *context*! Figuratively and literally JSON-LD enables us to clearly define what our *terms* mean via a `@context` which is a JSON document that maps *keys* to long form, unique terms that can be documented. In the following we'll look at keys/terms that we get from the VC Data Model 2.0 *context* and the Data Integrity 1.0 *context*, then we'll define a custome context for our club.
-
+In @lst-Poles we see that "mystery club" has issued a credential about *equipment* to a *credential subject*. We see that subject has a key denoted *poles*. But what does this mean? (a) hiking poles, (b) treking poles, (c) spinaker pole, (d) poles for pole-vaulting, (e) alpine ski poles, (f) cross country ski poles, (g) gondolier pole, etc... What we are missing is *context*! Figuratively and literally JSON-LD enables us to clearly define what our *terms* mean via a `@context` which is a JSON document that maps *keys* to long form, unique terms that can be documented. In the following we'll look at keys/terms that we get from the VC Data Model 2.0 *context* and the Data Integrity 1.0 *context*, then we'll define a custome context for our club.
 
 ## Structure and Fields from the VC Data Model 2.0
 
@@ -246,9 +245,9 @@ The VC Data Model 2.0 [@VC-DM2.0] provides us with the following required and op
 
 ## Example Sport Specific Credential
 
-I'm going to work somewhat backwards and will start with a fairly rich example for the wind sport discipline of "windsurf foiling" and then use that to guide the development of the corresponding `@context`.
+I'm going to work somewhat backwards and will start with a fairly rich example for the wind sport discipline of "windsurf foiling" and then use that to guide the development of the corresponding `@context`. My first attempt is shown in @lst-Windsurf.
 
-```javascript
+```{#lst-Windsurf .javascript lst-cap="Windsurf foiling (sport) specific credential."}
 {
   "@context": [
     "https://www.w3.org/ns/credentials/v2",
@@ -290,9 +289,9 @@ I'm going to work somewhat backwards and will start with a fairly rich example f
 
 The above example credential may need a bit of clean up. The `name` key may not be able to be redefined. In general every term (key) used in our example and not part of the VC DM2 needs to be defined in our club specific context. These include: *membership*, *start*, *end*, *knowledge*, *topic*, *date*, *skills*, *name*, *distanceAchiements*. Note that I've reused *name* and *date* in multiple places. Is this bad?
 
-I was getting errors on redefining *name* so revised the example credential to look like:
+I was getting errors on redefining *name* so revised the example credential from @lst-Windsurf to look like that shown in @lst-Windsurf2.
 
-```json
+```{#lst-Windsurf2 .json lst-cap="Windsurf foiling (sport) specific credential again."}
 {
   "@context": [
     "https://www.w3.org/ns/credentials/v2",
@@ -319,16 +318,16 @@ I was getting errors on redefining *name* so revised the example credential to l
     "skills": [{"skill": "Rigging", "date":"2010-01-01T00:00:00Z"},
         {"skill": "FoilSetup", "date": "2017-01-01T00:00:00Z"}
     ],
-    "distanceAchiements": [{"landmark": "TI", "date": "2010-01-01T00:00:00Z"},
+    "distanceAchievements": [{"landmark": "TI", "date": "2010-01-01T00:00:00Z"},
         {"landmark": "R2", "date": "2011-01-01T00:00:00Z"}
     ]
   }
 }
 ```
 
-Iterating via the VC Playground with an embedded context first led finally to the following club specific context:
+Giving every *key*/*term* I introduced a unique URI and a bit of extra info produced my first club specific context shown in @lst-ContextV1. To quickly check for errors I started with this context "embedded" in the example credential and then checked it with the [JSON-LD Playground](https://json-ld.org/playground/).
 
-```json
+```{#lst-ContextV1 .json lst-cap="Windsurf foiling specific context version 1."}
 {
     "@context": {
         "Member": "https://bawfc.grotto-networking.com/cred/#Member",
@@ -365,9 +364,9 @@ Iterating via the VC Playground with an embedded context first led finally to th
 }
 ```
 
-We can use "type specific" subcontexts to better reflect our intent and get something like:
+We can use "type specific" subcontexts to better reflect the separation between a generic *Member* and a *WindsurfFoiler* as shown in @lst-ContextV2.
 
-```json
+```{#lst-ContextV2 .json lst-cap="Windsurf foiling specific context version 2."}
 {
     "@context": {
         "@protected": true,
@@ -404,9 +403,9 @@ We can use "type specific" subcontexts to better reflect our intent and get some
 }
 ```
 
-And we can further nest our definitions to reflect out intent with something like:
+And we can further nest our definitions to reflect our design intent with @lst-ContextV3.
 
-```json
+```{#lst-ContextV3 .json lst-cap="Windsurf foiling specific context version 3."}
 {
     "@context": {
         "Member": {
