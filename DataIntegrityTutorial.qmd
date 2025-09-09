@@ -279,6 +279,85 @@ I'm going to work somewhat backwards and will start with a fairly rich example f
 
 ## Creating the Club Specific `@context`
 
+The above example credential may need a bit of clean up. The `name` key may not be able to be redefined. In general every term (key) used in our example and not part of the VC DM2 needs to be defined in our club specific context. These include: *membership*, *start*, *end*, *knowledge*, *topic*, *date*, *skills*, *name*, *distanceAchiements*. Note that I've reused *name* and *date* in multiple places. Is this bad?
+
+I was getting errors on redefining *name* so revised the example credential to look like:
+
+```json
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://bawfc.grotto-networking.com/credentials"
+  ],
+ "name": "Bay Area Windsurf Foiling Credential",
+  "description": "Denotes membership, knowledge, and skills in windsurf foiling",
+  "type": ["VerifiableCredential", "WindFoilCredential"],
+  "issuer": {
+    "id": "https://bawfc.grotto-networking.com",
+    "name": "Bay Area Windsurf Foiling Club",
+    "description": "Not a real club, but real information!"
+  },
+  "credentialSubject": {
+    "type": ["Member", "WindsurfFoiler"],
+    "membership":
+        {"start": "2025-03-01T00:00:00Z", "end": "2025-10-31T00:00:00Z"},
+    "knowledge": [ {"topic": "DockEtiquette", "date": "1984-01-01T00:00:00Z"},
+        {"topic": "TidesAndCurrents", "date": "2010-01-01T00:00:00Z"},
+        {"topic": "WindPatterns", "date": "2010-01-01T00:00:00Z"},
+        {"topic": "LandMarksBuoys", "date": "2010-01-01T00:00:00Z"},
+        {"topic": "BigBoatsFerries", "date": "2010-01-01T00:00:00Z"}
+    ],
+    "skills": [{"skill": "Rigging", "date":"2010-01-01T00:00:00Z"},
+        {"skill": "FoilSetup", "date": "2017-01-01T00:00:00Z"}
+    ],
+    "distanceAchiements": [{"landmark": "TI", "date": "2010-01-01T00:00:00Z"},
+        {"landmark": "R2", "date": "2011-01-01T00:00:00Z"}
+    ]
+  }
+}
+```
+
+Iterating via the VC Playground with an embedded context first led finally to the following club specific context:
+
+```json
+{
+    "@context": {
+        "Member": "https://bawfc.grotto-networking.com/cred/#Member",
+        "WindsurfFoiler": "https://bawfc.grotto-networking.com/cred/#Member",
+        "membership": "https://bawfc.grotto-networking.com/cred/#membership",
+        "knowledge": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#knowledge",
+            "@container": "@set"
+        },
+        "skills": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#skills",
+            "@container": "@set"
+        },
+        "distanceAchiements": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#distanceAchiements",
+            "@container": "@set"
+        },
+        "start": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#skills",
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "end": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#skills",
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "topic": "https://bawfc.grotto-networking.com/cred/#topic",
+        "date": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#skills",
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "skill": "https://bawfc.grotto-networking.com/cred/#skill",
+        "landmark": "https://bawfc.grotto-networking.com/cred/#landmark"
+    }
+}
+```
+
+TODO: clean up based on feedback and discuss.
+
 # Signatures, Keys, and Cryptosuites, oh my!
 
 ## Choosing a Cryptosuite
