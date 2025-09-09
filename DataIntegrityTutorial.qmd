@@ -24,7 +24,15 @@ In addition we will go through the decision process in selecting the appropriate
 
 Suppose that we have two community hiking clubs (purely fictitious): *The Arcata Tall Trees Hiking Club* and the *White Mountain Old Trees Hiking Club* as shown below. Both clubs exists to promote the "great outdoors", hiking safety, and comraderie.
 
-![The tallest trees (Coast Redwoods)](CoastRedwoord.jpg) ![The oldest trees (Bristlecone pine)](BristleconePine.jpg)
+::: {#fig-elephants layout-ncol=2}
+
+![The tallest trees (Coast Redwoods)](CoastRedwoord.jpg){#fig-tall}
+
+ ![The oldest trees (Bristlecone pine)](BristleconePine.jpg){#fig-old}
+
+Two Different Hiking Clubs
+:::
+
 
 When teaching begining and intermediate website development to computer science majors one of the authors of this tutorial would have students create a website for a real or fictional school or community club of their choosing, such as a hiking club, a guitar club, a cooking club etc... They would develop this website from a simple static HTML page to a full front-end/back-end server based application with logins for club members and club officers with different views and club management capabilities based on membership/officer status. A partially complete example club is the [Bay Area Windsurf Foiling Club](https://bawfc.grotto-networking.com/index.html). This tutorial goes one step further and adds the ability to issue verifiable credentials to its members so that they can participate in someway with a different club that has some kind of reciprocity agreement.
 
@@ -210,9 +218,9 @@ From the above we see that "mystery club" has issued a credential about *equipme
 
 ## Structure and Fields from the VC Data Model 2.0
 
-The VC Data Model 2.0 [@VC-DM2.0] provides us with the following required and optional structure as shown below. Note that the *comments* `//` are not legal JSON syntax but are included here to explain the contents in a compact manner.
+The VC Data Model 2.0 [@VC-DM2.0] provides us with the following required and optional structure as shown below. Note that the *comments* `//` are not legal JSON syntax but are included here to explain the contents in a compact manner. As seen in @lst-VCDMAnnotated below:
 
-```javascript
+```{#lst-VCDMAnnotated .javascript lst-cap="Annotated VC Data Model example."}
 {
   "@context": [
     "https://www.w3.org/ns/credentials/v2",
@@ -357,7 +365,120 @@ Iterating via the VC Playground with an embedded context first led finally to th
 }
 ```
 
-TODO: clean up based on feedback and discuss.
+We can use "type specific" subcontexts to better reflect our intent and get something like:
+
+```json
+{
+    "@context": {
+        "@protected": true,
+        "Member": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#Member",
+            "@context": {
+                "membership": "https://bawfc.grotto-networking.com/cred/#membership"
+            }
+        },
+        "WindsurfFoiler": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#WindsurfFoiler",
+            "@context": {
+                "knowledge": "https://bawfc.grotto-networking.com/cred/#knowledge",
+                "skills": "https://bawfc.grotto-networking.com/cred/#skills",
+                "distanceAchiements": "https://bawfc.grotto-networking.com/cred/#distanceAchiements"
+            }
+        },
+        "start": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#start",
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "end": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#end",
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "topic": "https://bawfc.grotto-networking.com/cred/#topic",
+        "date": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#date",
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "skill": "https://bawfc.grotto-networking.com/cred/#skill",
+        "landmark": "https://bawfc.grotto-networking.com/cred/#landmark"
+    }
+}
+```
+
+And we can further nest our definitions to reflect out intent with something like:
+
+```json
+{
+    "@context": {
+        "Member": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#Member",
+            "@context": {
+                "@protected": true,
+                "membership": {
+                    "@id": "https://bawfc.grotto-networking.com/cred/#membership",
+                    "@context": {
+                        "@protected": true,
+                        "start": {
+                            "@id": "https://bawfc.grotto-networking.com/cred/#start",
+                            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                        },
+                        "end": {
+                            "@id": "https://bawfc.grotto-networking.com/cred/#end",
+                            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                        }
+                    }
+                }
+            }
+        },
+        "WindsurfFoiler": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#WindsurfFoiler",
+            "@context": [
+                {
+                    "knowledge": {
+                        "@id": "https://bawfc.grotto-networking.com/cred/#knowledge",
+                        "@container": "@set",
+                        "@context": {
+                            "@protected": true,
+                            "topic": "https://bawfc.grotto-networking.com/cred/#topic",
+                            "date": {
+                                "@id": "https://bawfc.grotto-networking.com/cred/#date",
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                            }
+                        }
+                    }
+                },
+                {
+                    "skills": {
+                        "@id": "https://bawfc.grotto-networking.com/cred/#skills",
+                        "@container": "@set",
+                        "@context": {
+                            "@protected": true,
+                            "skill": "https://bawfc.grotto-networking.com/cred/#skill",
+                            "date": {
+                                "@id": "https://bawfc.grotto-networking.com/cred/#date",
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                            }
+                        }
+                    }
+                },
+                {
+                    "distanceAchiements": {
+                        "@id": "https://bawfc.grotto-networking.com/cred/#distanceAchiements",
+                        "@container": "@set",
+                        "@context": {
+                            "@protected": true,
+                            "landmark": "https://bawfc.grotto-networking.com/cred/#landmark",
+                            "date": {
+                                "@id": "https://bawfc.grotto-networking.com/cred/#date",
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+```
 
 # Signatures, Keys, and Cryptosuites, oh my!
 

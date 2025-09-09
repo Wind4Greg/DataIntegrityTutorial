@@ -1,20 +1,19 @@
 {
     "@context": {
         "@protected": true,
-        "Member": "https://bawfc.grotto-networking.com/cred/#Member",
-        "WindsurfFoiler": "https://bawfc.grotto-networking.com/cred/#WindsurfFoiler",
-        "membership": "https://bawfc.grotto-networking.com/cred/#membership",
-        "knowledge": {
-            "@id": "https://bawfc.grotto-networking.com/cred/#knowledge",
-            "@container": "@set"
+        "Member": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#Member",
+            "@context": {
+                "membership": "https://bawfc.grotto-networking.com/cred/#membership"
+            }
         },
-        "skills": {
-            "@id": "https://bawfc.grotto-networking.com/cred/#skills",
-            "@container": "@set"
-        },
-        "distanceAchiements": {
-            "@id": "https://bawfc.grotto-networking.com/cred/#distanceAchievements",
-            "@container": "@set"
+        "WindsurfFoiler": {
+            "@id": "https://bawfc.grotto-networking.com/cred/#WindsurfFoiler",
+            "@context": {
+                "knowledge": "https://bawfc.grotto-networking.com/cred/#knowledge",
+                "skills": "https://bawfc.grotto-networking.com/cred/#skills",
+                "distanceAchiements": "https://bawfc.grotto-networking.com/cred/#distanceAchiements"
+            }
         },
         "start": {
             "@id": "https://bawfc.grotto-networking.com/cred/#start",

@@ -244,6 +244,148 @@ Complete specifications in the education area: [Open Badges Overview](https://ww
 
 Note that the CLR 2.0 *context* uses `"@container": "@set"` for its `achievement` field, i.e., multiple "achievements" while in Open Badges 3.0 you get one acheivement.
 
+Notes from Dave L:
+
+it looks like what you want / don't know about is type-scoped contexts
+
+one reason to use types is that you can scope all of your properties underneath that "type" of thing ... so they only become operative when that type is present -- which also allows the same JSON names to be used on different types and have those properties map to different things, for example:
+
+{
+  "type": "Animal",
+  "legs": 4
+}
+
+vs.
+
+{
+  "type": "Table",
+  "legs": 4
+}
+
+but who knows, maybe "legs" should map to the same global URL there :stuck_out_tongue: ... anyway, a matter for the vocabulary experts in the space.
+
+so, to give an example of type-scoped contexts, i think we can grab the VC 2.0 context ... one moment ...
+yeah, so in this guy: https://www.w3.org/ns/credentials/v2 ... here's a snippet:
+
+```json
+    "VerifiableCredential": {
+      "@id": "https://www.w3.org/2018/credentials#VerifiableCredential",
+      "@context": {
+        "@protected": true,
+
+        "id": "@id",
+        "type": "@type",
+
+        "confidenceMethod": {
+          "@id": "https://www.w3.org/2018/credentials#confidenceMethod",
+          "@type": "@id"
+        },
+        "credentialSchema": {
+          "@id": "https://www.w3.org/2018/credentials#credentialSchema",
+          "@type": "@id"
+        },
+        "credentialStatus": {
+          "@id": "https://www.w3.org/2018/credentials#credentialStatus",
+          "@type": "@id"
+        },
+        "credentialSubject": {
+          "@id": "https://www.w3.org/2018/credentials#credentialSubject",
+          "@type": "@id"
+        },
+        ...
+      }
+    }
+    ...
+  }
+}
+```
+
+that defines the properties "confidenceMethod", "credentialSchema", "credentialSubject", etc. ... but ONLY on objects of type "VerifiableCredential".
+(hopefully all of those things sound familiar to you from working with VCs as well)
+
+so you can rework your context like this:
+
+```json
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    {
+      "Member": {
+        "@id": "https://bawfc.grotto-networking.com/cred/#Member",
+        "@context": {
+          "membership": "https://bawfc.grotto-networking.com/cred/#membership"
+        }
+      },
+      "WindsurfFoiler": {
+        "@id": "https://bawfc.grotto-networking.com/cred/#WindsurfFoiler",
+        "@context": {
+          "knowledge": "https://bawfc.grotto-networking.com/cred/#knowledge",
+          "skills":"https://bawfc.grotto-networking.com/cred/#skills",
+          "distanceAchiements": "https://bawfc.grotto-networking.com/cred/#distanceAchiements",
+        }
+      },
+      "start": {"@id": "https://bawfc.grotto-networking.com/cred/#start",
+                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"},
+      "end": {"@id": "https://bawfc.grotto-networking.com/cred/#end",
+                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"},
+      "topic": "https://bawfc.grotto-networking.com/cred/#topic",
+      "date": {"@id": "https://bawfc.grotto-networking.com/cred/#date",
+                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"},
+      "skill": "https://bawfc.grotto-networking.com/cred/#skill",
+      "landmark": "https://bawfc.grotto-networking.com/cred/#landmark"
+    }
+  ]
+  ...
+}
+```
+
+so you can see the "Member" and "WindsurfFoiler" get their own "sub contexts" ... which only become active when the type is present on the object in the data model.
+
+there are other things i'd also recommend here, like using @protected both in your top-level context and in any scoped contexts, just like the VC 2.0 context does (see above); @protected prevents people from changing the term definitions in the data itself in unsafe ways (and this is mentioned in the VC 2.0 spec)
+
+you can also use property-scoped contexts, if you'd like ...
+which allows you to specify a "sub context" that only becomes active underneath a particular property in the JSON, i.e., in one "nested branch" of the JSON...
+
+so, you could, if you felt it necessary to help avoid global conflicts (probably unnecessary here), move the "skill" and "landmark" stuff up into the "skills" property definition above in a sub context there
+if you were designing a larger vocabulary for reuse in many use cases, this is a good idea.
+same with redeclaring @id and @type inside scoped contexts ... which you'll see in the VC 2.0 context ... these sorts of things are good hygiene for "large use cases" or larger vocabs that might be reused to mix and match in interesting ways
+
+i don't think all that's really needed here for a windsurfing club -- but good to know.
+
+the other thing that is usually recommended is: reuse existing vocabulary terms from existing popular vocabs, i.e., just like one does not invent new words -- they just reuse the ones from the dictionary, it's good to reuse big popular vocabs if you can (like schema.org) ... of course, i understand that you're intentionally putting together your own vocab here...
+9:13
+but it's worth noting that even when designing your own context or a new vocabulary to use in it, it's good to do as much reuse as you can with the existing ecosystem
+
+anyway, hopefully these tips help ... one problem i experience myself with recommending tools (other than the playground and the specs) is that i was involved in all the work ...
+
+note there were a few typos i noticed in that context as well as i edited it (distanceAchiements (missing v) in two places ... and a number of the terms went to the same URL instead of different ones)
+
+like this:
+"date": {"@id": "https://bawfc.grotto-networking.com/cred/#skills",
+                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"},
+
+you can see that maps "date" to "...#skills"! (edited)
+so that's going to burn you in the playground too if you're messing around with expansion and compaction ... stuff will get all kinds of wonky as it programmatically maps stuff to things you weren't expecting due to the typos (it will do what you tell it to! :stuck_out_tongue: )
+that's the kind of thing that either ... "AI" or some clever highlighting/algorithms might help people notice
+
+having two terms that map to the same URL is an actual "use case", even if it's usually a "mistake"/"typo" ... so hard to help people in the right ways sometimes.
+the processor is only going to run when you run compaction or expansion (or another JSON-LD API function)
+and it will check basic JSON-LD syntax ... and basic structures if you ask for them like "set" manipulation as you mentioned but it's not JSON schema -- and that's important.
+
+just because you declare that you prefer something to be expressed as a set when you run "compact" doesn't mean it isn't legal JSON-LD to express it as a non-set.
+so it's really important to remember that JSON-LD is about expressing meaning ... and not about restricting structure (this is what JSON schema is for).
+what you want to make sure you do with JSON-LD is express how everything that appears in your document ought to be understood on a global scale ... once you've taken into consideration where and how it appears in the document.
+that doesn't meant that you MUST express it this way or that way (JSON schema) -- but rather when you DO express it this way it means THIS
+so you can use JSON-LD and JSON schema together to get really tight data if you want it.
+some people want really tight data (quite often you do with VCs, but not necessarily always) and some people do not, especially when they only work with the data on a graph level ... and they don't expect everyone to have to express everything the same way.
+(powerful decentralized properties)
+
+so there's a lot of power in the expressivity here ... but that's not great when trying to teach beginners how to do things or trying to teach "good basic best practices for simple use cases" ... which is what is really lacking in the VC ecosystem.
+
+it's good that we've been able to get a good base and powerful foundation to build just about anything in the decentralized world here ... but now we need some good layers added on top to guide people who don't want to build everything from that layer up!
+hence, OpenBadges, and other efforts like that that make opinionated choices on top of the base layers.
+
+
 
 # Club Credential Workflow
 
