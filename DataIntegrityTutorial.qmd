@@ -4,6 +4,7 @@ author: "Dr. Greg M. Bernstein and others?"
 toc: true
 number-sections: true
 bibliography: DataIntegrity.bib
+csl: ieee.csl
 ---
 
 # Introduction
