@@ -398,6 +398,7 @@ hence, OpenBadges, and other efforts like that that make opinionated choices on 
 Some references/articles:
 
 * [OWASP: Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html) Comprehensive. See, for example section "3.2 Where should a secret be?".
+* [OWASP: Key Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html)
 * [Implementing CCM: Cryptography, Encryption, and Key Management](https://cloudsecurityalliance.org/blog/2025/03/10/implementing-ccm-cryptography-encryption-and-key-management) from the Cloud Security Alliance. Also [Cloud Key Management](https://cloudsecurityalliance.org/research/topics/cloud-key-management)
 * Hardware and Software Security
   * [Hardware Security: Understanding the Differences Between a Secure Element, TPM, HSM, and a TEE](https://tropicsquare.com/blogs/hardware-security-understanding-the-differences-between-a-secure-element-tpm-hsm-and-a-tee), [TPMs, TEEs, and Everything In Between: What You Actually Need to Know](https://unmitigatedrisk.com/?p=991), [What Is the Difference Between HSM, TPM, Secure Enclave, and Secure Element or Hardware Root of Trust](https://www.wolfssl.com/difference-hsm-tpm-secure-enclave-secure-element-hardware-root-trust/)

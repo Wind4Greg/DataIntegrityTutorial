@@ -8,6 +8,10 @@ bibliography: DataIntegrity.bib
 
 # Using Quarto
 
+## Quarto and qmd Files
+
+Quarto can work with Markdown for authoring. Its VSCode plugin is very good and provides lots of cross referencing help on `*.qmd` files. GitHub does not understand these as Markdown files and hence offers not preview capabilities. One way to get around this is that Quarto can *render* to GitHub flavored markdown, *gfm*, via a command such as `render DataIntegrityTutorial.qmd --to gfm`. I have the Quarto rendering put into the `outputs` directory and from there folks should get a rough preview.
+
 ## Citations and Bibliographies
 
 Supports citations by linking to either [BibTex](https://en.wikipedia.org/wiki/BibTeX) or CSL [Citation Style Language](https://en.wikipedia.org/wiki/Citation_Style_Language) -- used by Zotero. The details on the formats are explained in [PanDoc: specifying bibliographic data](https://pandoc.org/MANUAL.html#specifying-bibliographic-data).

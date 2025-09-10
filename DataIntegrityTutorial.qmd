@@ -22,9 +22,9 @@ In addition we will go through the decision process in selecting the appropriate
 
 ## Cooperating School/Community Clubs Use Case
 
-Suppose that we have two community hiking clubs (purely fictitious): *The Arcata Tall Trees Hiking Club* and the *White Mountain Old Trees Hiking Club* as shown below. Both clubs exists to promote the "great outdoors", hiking safety, and comraderie.
+Suppose that we have two community hiking clubs (purely fictitious): *The Arcata Tall Trees Hiking Club* @fig-tall and the *White Mountain Old Trees Hiking Club* @fig-old. Both clubs exists to promote the "great outdoors", hiking safety, and comraderie.
 
-::: {#fig-elephants layout-ncol=2}
+::: {#fig-HikingClubs layout-ncol=2}
 
 ![The tallest trees (Coast Redwoods)](CoastRedwoord.jpg){#fig-tall}
 
