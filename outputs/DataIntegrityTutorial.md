@@ -29,14 +29,15 @@ Dr. Greg M. Bernstein and others?
     Specific `@context`](#creating-the-club-specific-context)
 - [<span class="toc-section-number">3</span> Signatures, Keys, and
   Cryptosuites, oh my!](#signatures-keys-and-cryptosuites-oh-my)
-  - [<span class="toc-section-number">3.1</span> Choosing a
-    Cryptosuite](#choosing-a-cryptosuite)
-  - [<span class="toc-section-number">3.2</span> Dealing with
+  - [<span class="toc-section-number">3.1</span> Dealing with
     Cryptographic Keys](#dealing-with-cryptographic-keys)
-    - [<span class="toc-section-number">3.2.1</span> Private
+    - [<span class="toc-section-number">3.1.1</span> Private
       keys](#private-keys)
-    - [<span class="toc-section-number">3.2.2</span> Public keys
-      (DIDs)](#public-keys-dids)
+    - [<span class="toc-section-number">3.1.2</span> Public keys:
+      Verification methods and
+      DIDs](#public-keys-verification-methods-and-dids)
+  - [<span class="toc-section-number">3.2</span> Choosing a
+    Cryptosuite](#choosing-a-cryptosuite)
 - [<span class="toc-section-number">4</span> Credential
   Issuance](#credential-issuance)
   - [<span class="toc-section-number">4.1</span> Proof Options:
@@ -741,10 +742,13 @@ Listing 9: Windsurf foiling specific context version 3.
 
 # Signatures, Keys, and Cryptosuites, oh my!
 
-## Choosing a Cryptosuite
-
-Basic review of digital signatures, public key cryptography. Concerned
-with forgeries!
+To “secure” a verifiable credential, i.e., to actually make a credential
+verifiable, requires the use of a digital signature. [Digital
+signatures](https://en.wikipedia.org/wiki/Digital_signature) are a
+specific type of cryptographic primitive that uses *public-key*
+cryptography. Two different keys are used in a digital signature system:
+(1) a private key is used to sign data, (2) a public key is used to
+verify the signature on the data.
 
 ## Dealing with Cryptographic Keys
 
@@ -752,11 +756,78 @@ with forgeries!
 
 These need to be **protected**! There is a wide range of approaches…
 
-### Public keys (DIDs)
+Lots of different formats/ representations for the same information
+
+<div id="lst-KeyFormats">
+
+Listing 10: Different formations and representations for private and
+public keys.
+
+``` javascript
+{
+    privateKeyHex: "4b49e4ec275c7590d39672508b2717c2dc1dc015e50a5d064732742413c810e0",
+    publicKeyHex: "419d02f127a4703ee3e09d071a1ddf2bd8be891558c5023e64232dc7f255eda4",
+    publicKeyMultibase: "z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj",
+    privateKeyMultibase: "z3u2WHhiUqnajJreS8TQw2M57nMfjr7pD7pbme2M66U6BBgb",
+    didKey: "did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"
+}
+```
+
+</div>
+
+### Public keys: Verification methods and DIDs
 
 This needs to be made available in a “secure maner”, don’t want a
 malicious party to substitute in their public key and *impersonate* the
 real issuer.
+
+For testing purposes the [`did:key` DID
+method](https://w3c-ccg.github.io/did-key-spec/) is the easiest to use
+since the value of key is embedded in the DID method, e.g.,
+`did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj` contains an
+encoded verion of the actual public key value.
+
+***Note*** per [section 3.12 of the did:key
+spec](https://w3c-ccg.github.io/did-key-spec/#signature-method-creation-algorithm)
+when using a `did:key` value in the proof options *verificationMethod*
+field step 5 states to add a hash (#) character and then the multibase
+value so a DID key of
+`did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj` leads to a
+`verificationMethod: "did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj#z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"`
+updated versions also allow the format:
+`verificationMethod: "did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj#vm"`
+which is less redundant. You may see both in the test vectors in the W3C
+VC documents.
+
+For deployment, since we already have a website, we can use the
+`did:web` method. For that we need a basic DID document such as that
+shown in <a href="#lst-DIDdoc" class="quarto-xref">Listing 11</a>.
+
+<div id="lst-DIDdoc">
+
+Listing 11: Simple DID document.
+
+``` json
+{
+  "@context": ["https://www.w3.org/ns/did/v1",
+  "https://w3id.org/security/multikey/v1"],
+  "id": "did:web:bawfc.grotto-networking.com",
+  "verificationMethod": [{
+      "id": "did:web:bawfc.grotto-networking.com#vm",
+      "type": "Multikey",
+      "controller": "did:web:bawfc.grotto-networking.com",
+      "publicKeyMultibase": "z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"
+  }],
+  "assertionMethod": ["did:web:bawfc.grotto-networking.com#vm"]
+}
+```
+
+</div>
+
+## Choosing a Cryptosuite
+
+Basic review of digital signatures, public key cryptography. Concerned
+with forgeries!
 
 # Credential Issuance
 

@@ -1,6 +1,5 @@
 DataIntegrityNotes_files/
 DataIntegrityTutorial_files/
-*.html
-
-
+/src/node_modules
+/src/output
 /.quarto/
