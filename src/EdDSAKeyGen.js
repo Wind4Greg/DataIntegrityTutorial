@@ -14,7 +14,7 @@ Used to generate as many Ed25519 key pairs as desired for use in
 
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import { base58btc } from "multiformats/bases/base58";
-import {ed25519 as ed, ed25519} from '@noble/curves/ed25519.js';
+import {ed25519} from '@noble/curves/ed25519.js';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils.js';
 
 const ED25519_PUB_PREFIX = 0xed;

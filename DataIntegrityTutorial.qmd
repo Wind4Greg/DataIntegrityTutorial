@@ -485,13 +485,43 @@ To "secure" a verifiable credential, i.e., to actually make a credential verifia
 
 ## Dealing with Cryptographic Keys
 
-### Private keys
+A short list of references for dealing with cryptographic keys follows.
 
-These need to be **protected**! There is a wide range of approaches...
+* [NIST SP 800-57 Part 1 Recommendation for Key Management: Part 1 – General](https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final) "This Recommendation provides cryptographic key-management guidance.", This is ***the*** comprehensive reference and is frequently cited in other guides.
+* [OWASP: Key Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html)
+* [OWASP: Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
 
-Lots of different formats/ representations for the same information
+NIST SP 800-57 lists 19 different types of cryptographic keys. For issuing credentials for out club we will only be concerned with their first two types:
 
-```{#lst-KeyFormats .javascript lst-cap="Different formations and representations for private and public keys."}
+```
+1. Private signature key: Private signature keys are the private keys of asymmetric-key
+(public-key) key pairs that are used by public-key algorithms to generate digital signatures
+intended for long-term use. When properly handled, private signature keys can be used to
+provide source authentication and integrity authentication as well as support the non-
+repudiation of messages, documents, or stored data.
+2. Public signature-verification key: A public signature-verification key is the public key of
+an asymmetric-key (public-key) key pair that is used by a public-key algorithm to verify
+digital signatures that are intended to provide source authentication and integrity
+authentication as well as support the non-repudiation of messages, documents, or stored
+data.
+```
+
+It is important to note that our website will be using more than one set of such key pairs and these must not be confused or reused. In particular, for our website their with be a key pair used in [HTTPS](https://en.wikipedia.org/wiki/HTTPS) service. This is completely different from the key pair used in signing our credentials.
+
+### Generating Key Pairs
+
+In general the private  and public portions of a key pair are generated at the same time as shown in the code snippet
+
+```{#lst-KeyGen .javascript lst-cap="Simple generation of private and public key pair for a particular cryptographic algorithm."}
+import {ed25519} from '@noble/curves/ed25519.js';
+let { privateKey, publicKey } = ed25519.keygen();
+```
+
+The private portion of the key must be **protected** and never revealed! It only needs to be known to our code that will actually run the signing algorithm. The public portion needs to be distributed in a secure way so that a verifier will have a high assurance that the public key is actually for our club and not an imposter.
+
+Note that you may see a number of different formats for the same key information. In @lst-KeyFormats we show some common formats all for the same public/private pair.
+
+```{#lst-KeyFormats .javascript lst-cap="Different encodings for private and public keys."}
 {
     privateKeyHex: "4b49e4ec275c7590d39672508b2717c2dc1dc015e50a5d064732742413c810e0",
     publicKeyHex: "419d02f127a4703ee3e09d071a1ddf2bd8be891558c5023e64232dc7f255eda4",
@@ -501,7 +531,7 @@ Lots of different formats/ representations for the same information
 }
 ```
 
-### Public keys: Verification methods and DIDs
+### Sharing Public keys: Verification methods and DIDs
 
 This needs to be made available in a "secure maner", don't want a malicious party to substitute in their public key and *impersonate* the real issuer.
 
@@ -510,22 +540,23 @@ For testing purposes the [`did:key` DID method](https://w3c-ccg.github.io/did-ke
 ***Note*** per [section 3.12 of the did:key spec](https://w3c-ccg.github.io/did-key-spec/#signature-method-creation-algorithm) when using a `did:key` value in the proof options *verificationMethod* field step 5 states to add a hash (#) character and then the multibase value so a DID key of `did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj` leads to a
 `verificationMethod: "did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj#z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"` updated versions also allow the format: `verificationMethod: "did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj#vm"` which is less redundant. You may see both in the test vectors in the W3C VC documents.
 
-For deployment, since we already have a website, we can use the `did:web` method. For that we need a basic DID document such as that shown in @lst-DIDdoc.
+For deployment, since we already have a website, we can use the [`did:web` DID method](https://w3c-ccg.github.io/did-method-web/)  For that we need a basic DID document such as that shown in @lst-DIDdoc.
 
 ```{#lst-DIDdoc .json lst-cap="Simple DID document."}
 {
   "@context": ["https://www.w3.org/ns/did/v1",
   "https://w3id.org/security/multikey/v1"],
   "id": "did:web:bawfc.grotto-networking.com",
-  "verificationMethod": [{
+  "assertionMethod": [{
       "id": "did:web:bawfc.grotto-networking.com#vm",
       "type": "Multikey",
       "controller": "did:web:bawfc.grotto-networking.com",
       "publicKeyMultibase": "z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"
-  }],
-  "assertionMethod": ["did:web:bawfc.grotto-networking.com#vm"]
+  }]
 }
 ```
+
+We should note that given a website that the [`did:webvh` DID method](https://identity.foundation/didwebvh/v1.0/) can also be used and contains enhanced functionality for dealing with key changes.
 
 ## Choosing a Cryptosuite
 

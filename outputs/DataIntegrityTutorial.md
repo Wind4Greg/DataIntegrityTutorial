@@ -31,11 +31,11 @@ Dr. Greg M. Bernstein and others?
   Cryptosuites, oh my!](#signatures-keys-and-cryptosuites-oh-my)
   - [<span class="toc-section-number">3.1</span> Dealing with
     Cryptographic Keys](#dealing-with-cryptographic-keys)
-    - [<span class="toc-section-number">3.1.1</span> Private
-      keys](#private-keys)
-    - [<span class="toc-section-number">3.1.2</span> Public keys:
-      Verification methods and
-      DIDs](#public-keys-verification-methods-and-dids)
+    - [<span class="toc-section-number">3.1.1</span> Generating Key
+      Pairs](#generating-key-pairs)
+    - [<span class="toc-section-number">3.1.2</span> Sharing Public
+      keys: Verification methods and
+      DIDs](#sharing-public-keys-verification-methods-and-dids)
   - [<span class="toc-section-number">3.2</span> Choosing a
     Cryptosuite](#choosing-a-cryptosuite)
 - [<span class="toc-section-number">4</span> Credential
@@ -752,16 +752,70 @@ verify the signature on the data.
 
 ## Dealing with Cryptographic Keys
 
-### Private keys
+A short list of references for dealing with cryptographic keys follows.
 
-These need to be **protected**! There is a wide range of approaches…
+- [NIST SP 800-57 Part 1 Recommendation for Key Management: Part 1 –
+  General](https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final) “This
+  Recommendation provides cryptographic key-management guidance.”, This
+  is ***the*** comprehensive reference and is frequently cited in other
+  guides.
+- [OWASP: Key Management Cheat
+  Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html)
+- [OWASP: Secrets Management Cheat
+  Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
 
-Lots of different formats/ representations for the same information
+NIST SP 800-57 lists 19 different types of cryptographic keys. For
+issuing credentials for out club we will only be concerned with their
+first two types:
+
+    1. Private signature key: Private signature keys are the private keys of asymmetric-key
+    (public-key) key pairs that are used by public-key algorithms to generate digital signatures
+    intended for long-term use. When properly handled, private signature keys can be used to
+    provide source authentication and integrity authentication as well as support the non-
+    repudiation of messages, documents, or stored data.
+    2. Public signature-verification key: A public signature-verification key is the public key of
+    an asymmetric-key (public-key) key pair that is used by a public-key algorithm to verify
+    digital signatures that are intended to provide source authentication and integrity
+    authentication as well as support the non-repudiation of messages, documents, or stored
+    data.
+
+It is important to note that our website will be using more than one set
+of such key pairs and these must not be confused or reused. In
+particular, for our website their with be a key pair used in
+[HTTPS](https://en.wikipedia.org/wiki/HTTPS) service. This is completely
+different from the key pair used in signing our credentials.
+
+### Generating Key Pairs
+
+In general the private and public portions of a key pair are generated
+at the same time as shown in the code snippet
+
+<div id="lst-KeyGen">
+
+Listing 10: Simple generation of private and public key pair for a
+particular cryptographic algorithm.
+
+``` javascript
+import {ed25519} from '@noble/curves/ed25519.js';
+let { privateKey, publicKey } = ed25519.keygen();
+```
+
+</div>
+
+The private portion of the key must be **protected** and never revealed!
+It only needs to be known to our code that will actually run the signing
+algorithm. The public portion needs to be distributed in a secure way so
+that a verifier will have a high assurance that the public key is
+actually for our club and not an imposter.
+
+Note that you may see a number of different formats for the same key
+information. In
+<a href="#lst-KeyFormats" class="quarto-xref">Listing 11</a> we show
+some common formats all for the same public/private pair.
 
 <div id="lst-KeyFormats">
 
-Listing 10: Different formations and representations for private and
-public keys.
+Listing 11: Different encodings for private and public keys.
 
 ``` javascript
 {
@@ -775,7 +829,7 @@ public keys.
 
 </div>
 
-### Public keys: Verification methods and DIDs
+### Sharing Public keys: Verification methods and DIDs
 
 This needs to be made available in a “secure maner”, don’t want a
 malicious party to substitute in their public key and *impersonate* the
@@ -800,29 +854,33 @@ which is less redundant. You may see both in the test vectors in the W3C
 VC documents.
 
 For deployment, since we already have a website, we can use the
-`did:web` method. For that we need a basic DID document such as that
-shown in <a href="#lst-DIDdoc" class="quarto-xref">Listing 11</a>.
+[`did:web` DID method](https://w3c-ccg.github.io/did-method-web/) For
+that we need a basic DID document such as that shown in
+<a href="#lst-DIDdoc" class="quarto-xref">Listing 12</a>.
 
 <div id="lst-DIDdoc">
 
-Listing 11: Simple DID document.
+Listing 12: Simple DID document.
 
 ``` json
 {
   "@context": ["https://www.w3.org/ns/did/v1",
   "https://w3id.org/security/multikey/v1"],
   "id": "did:web:bawfc.grotto-networking.com",
-  "verificationMethod": [{
+  "assertionMethod": [{
       "id": "did:web:bawfc.grotto-networking.com#vm",
       "type": "Multikey",
       "controller": "did:web:bawfc.grotto-networking.com",
       "publicKeyMultibase": "z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"
-  }],
-  "assertionMethod": ["did:web:bawfc.grotto-networking.com#vm"]
+  }]
 }
 ```
 
 </div>
+
+We should note that given a website that the [`did:webvh` DID
+method](https://identity.foundation/didwebvh/v1.0/) can also be used and
+contains enhanced functionality for dealing with key changes.
 
 ## Choosing a Cryptosuite
 
