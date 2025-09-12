@@ -34,8 +34,7 @@ Dr. Greg M. Bernstein and others?
     - [<span class="toc-section-number">3.1.1</span> Generating Key
       Pairs](#generating-key-pairs)
     - [<span class="toc-section-number">3.1.2</span> Sharing Public
-      keys: Verification methods and
-      DIDs](#sharing-public-keys-verification-methods-and-dids)
+      keys: DIDs](#sharing-public-keys-dids)
   - [<span class="toc-section-number">3.2</span> Choosing a
     Cryptosuite](#choosing-a-cryptosuite)
 - [<span class="toc-section-number">4</span> Credential
@@ -779,11 +778,27 @@ first two types:
     authentication as well as support the non-repudiation of messages, documents, or stored
     data.
 
+Side note NIST has a separate definition of public/private key pairs for
+authentication:
+
+    4. Private authentication key: A private authentication key is the private key of an
+    asymmetric-key (public-key) key pair that is used with a public-key algorithm to provide
+    assurance of the identity of an entity (i.e., identity authentication) when establishing an
+    authenticated communication session or authorization to perform some action.
+    5. Public authentication key: A public authentication key is the public key of an asymmetric-
+    key (public-key) key pair that is used with a public-key algorithm to provide assurance of
+    the identity of an entity (i.e., identity authentication) when establishing an authenticated
+    communication session or authorization to perform some action.
+
+NIST SP 800-57 states: “In general, a single key **shall** be used for
+only one purpose (e.g., encryption, integrity authentication, key
+wrapping, random bit generation, or digital signatures).”
+
 It is important to note that our website will be using more than one set
 of such key pairs and these must not be confused or reused. In
 particular, for our website their with be a key pair used in
 [HTTPS](https://en.wikipedia.org/wiki/HTTPS) service. This is completely
-different from the key pair used in signing our credentials.
+different from the key pair used in signing the club credentials.
 
 ### Generating Key Pairs
 
@@ -804,9 +819,13 @@ let { privateKey, publicKey } = ed25519.keygen();
 
 The private portion of the key must be **protected** and never revealed!
 It only needs to be known to our code that will actually run the signing
-algorithm. The public portion needs to be distributed in a secure way so
-that a verifier will have a high assurance that the public key is
-actually for our club and not an imposter.
+algorithm. The public portion needs to be distributed in a way so that a
+verifier will have a high assurance that the public key is actually for
+our club and not an imposter. This is a non-trivial problem and has led
+to the development of the elaborate [public key
+infrastructure](https://en.wikipedia.org/wiki/Public_key_infrastructure)
+and to [decentralized identifiers
+(DIDs)](https://en.wikipedia.org/wiki/Decentralized_identifier).
 
 Note that you may see a number of different formats for the same key
 information. In
@@ -829,11 +848,38 @@ Listing 11: Different encodings for private and public keys.
 
 </div>
 
-### Sharing Public keys: Verification methods and DIDs
+### Sharing Public keys: DIDs
 
-This needs to be made available in a “secure maner”, don’t want a
-malicious party to substitute in their public key and *impersonate* the
-real issuer.
+We are going to use a *decentralized identifier* (DID) to identify our
+club. There can be many “types” of DID and one main way that they are
+differentiated by their *method*. In short The job of the DID *method*
+is to resolve a DID into a *DID document* and assure the authenticity of
+that DID document. From [Decentralized Identifiers (DIDs)
+v1.0](https://www.w3.org/TR/did-1.0/): “A DID method specification MUST
+specify how a DID resolver uses a DID to resolve a DID document,
+including how the DID resolver can verify the ***authenticity*** of the
+response.”
+
+***Why?*** The DID document is where we will put the public signing key
+for the club’s credentials. This needs to be made available in a
+“reliable maner”, don’t want a malicious party to substitute in their
+public key and *impersonate* the real club (and forge club credentials).
+
+Need to discuss DIDs and PKI a bit here. [Wikipedia:
+DID](https://en.wikipedia.org/wiki/Decentralized_identifier),
+[Wikipedia: Public Key
+Infrastructure](https://en.wikipedia.org/wiki/Public_key_infrastructure).
+
+References:
+
+- [Decentralized Identifiers (DIDs)
+  v1.0](https://www.w3.org/TR/did-1.0/)
+- [Decentralized Identifiers (DIDs)
+  v1.1](https://www.w3.org/TR/did-1.1/) Working Draft
+- [Use Cases and Requirements for Decentralized
+  Identifiers](https://www.w3.org/TR/did-use-cases/) See section 1.2
+  “Concepts of Decentralized Identity” for a short overview of the roles
+  of *controller*, *requesting party*, *subject*.
 
 For testing purposes the [`did:key` DID
 method](https://w3c-ccg.github.io/did-key-spec/) is the easiest to use
@@ -877,6 +923,30 @@ Listing 12: Simple DID document.
 ```
 
 </div>
+
+How does `did:web` help with “reliably” getting the club’s public key to
+a verifier? The DID document (like that shown above) is “resolved” via
+the `did:web` method as just another web page on the club’s web site. In
+particular, if our DID is
+`did:web:bawfc.grotto-networking.com:signpubkey` then the above DID
+document would be obtain by getting the page:
+`https://bawfc.grotto-networking.com/signpubkey/did.json`.
+
+Note that in the resolved URL for the DID document that `https` is used.
+This implies that the full power of
+[HTTPS](https://en.wikipedia.org/wiki/HTTPS) and
+[TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security) which uses
+the existing [public key
+infrastructure](https://en.wikipedia.org/wiki/Public_key_infrastructure)
+guarantees the authenticity of the DID document as comming from our
+club’s website.
+
+*One more point*: The *certificates* that we get from [Let’s
+Encrypt](https://letsencrypt.org/) concern public/private key pair for
+our club’s website that is completely different from the public/private
+key pair that we use for signing the credentials issued by the club. I
+noticed that for these sites that the keys/certificates are changed
+every three months.
 
 We should note that given a website that the [`did:webvh` DID
 method](https://identity.foundation/didwebvh/v1.0/) can also be used and
