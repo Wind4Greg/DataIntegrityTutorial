@@ -1,6 +1,6 @@
 ---
 title: "VC Data Integrity Tutorial"
-author: "Dr. Greg M. Bernstein and others?"
+author: "Dr. Greg M. Bernstein"
 toc: true
 number-sections: true
 bibliography: DataIntegrity.bib
@@ -26,7 +26,7 @@ Suppose that we have two community hiking clubs (purely fictitious): *The Arcata
 
 ::: {#fig-HikingClubs layout-ncol=2}
 
-![The tallest trees (Coast Redwoods)](CoastRedwoord.jpg){#fig-tall}
+![The tallest trees (Coast Redwoods)](CoastRedwood.jpg){#fig-tall}
 
  ![The oldest trees (Bristlecone pine)](BristleconePine.jpg){#fig-old}
 

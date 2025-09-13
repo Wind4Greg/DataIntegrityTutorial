@@ -1,5 +1,7 @@
 DataIntegrityNotes_files/
 DataIntegrityTutorial_files/
+DataIntegritySlides_files/
 /src/node_modules
 /src/output
 /.quarto/
+/outputs/DataIntegritySlides.html

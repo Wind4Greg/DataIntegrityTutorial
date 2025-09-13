@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dr.&nbsp;Greg M. Bernstein and others?">
+
+<title>VC Data Integrity Tutorial</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="DataIntegrityTutorial_files/libs/clipboard/clipboard.min.js"></script>
+<script src="DataIntegrityTutorial_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="DataIntegrityTutorial_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="DataIntegrityTutorial_files/libs/quarto-html/popper.min.js"></script>
+<script src="DataIntegrityTutorial_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="DataIntegrityTutorial_files/libs/quarto-html/anchor.min.js"></script>
+<link href="DataIntegrityTutorial_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="DataIntegrityTutorial_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="DataIntegrityTutorial_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="DataIntegrityTutorial_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="DataIntegrityTutorial_files/libs/bootstrap/bootstrap-127f5460f95bae6694ead31f6e74e1e8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a>
+  <ul class="collapse">
+  <li><a href="#cooperating-schoolcommunity-clubs-use-case" id="toc-cooperating-schoolcommunity-clubs-use-case" class="nav-link" data-scroll-target="#cooperating-schoolcommunity-clubs-use-case"><span class="header-section-number">1.1</span> Cooperating School/Community Clubs Use Case</a>
+  <ul class="collapse">
+  <li><a href="#why-bother-with-verifiable-credentials" id="toc-why-bother-with-verifiable-credentials" class="nav-link" data-scroll-target="#why-bother-with-verifiable-credentials"><span class="header-section-number">1.1.1</span> Why Bother with Verifiable Credentials?</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#club-credential-specification" id="toc-club-credential-specification" class="nav-link" data-scroll-target="#club-credential-specification"><span class="header-section-number">2</span> Club Credential Specification</a>
+  <ul class="collapse">
+  <li><a href="#club-specific-domain-knowledge" id="toc-club-specific-domain-knowledge" class="nav-link" data-scroll-target="#club-specific-domain-knowledge"><span class="header-section-number">2.1</span> Club Specific Domain Knowledge</a></li>
+  <li><a href="#json-for-everything" id="toc-json-for-everything" class="nav-link" data-scroll-target="#json-for-everything"><span class="header-section-number">2.2</span> JSON for Everything!</a>
+  <ul class="collapse">
+  <li><a href="#data-modeling-and-exchange-json" id="toc-data-modeling-and-exchange-json" class="nav-link" data-scroll-target="#data-modeling-and-exchange-json"><span class="header-section-number">2.2.1</span> Data Modeling and Exchange: JSON</a></li>
+  <li><a href="#data-validation-json-schema" id="toc-data-validation-json-schema" class="nav-link" data-scroll-target="#data-validation-json-schema"><span class="header-section-number">2.2.2</span> Data Validation: JSON-Schema</a></li>
+  <li><a href="#but-what-does-it-mean-json-ld" id="toc-but-what-does-it-mean-json-ld" class="nav-link" data-scroll-target="#but-what-does-it-mean-json-ld"><span class="header-section-number">2.2.3</span> But What Does it mean: JSON-LD</a></li>
+  </ul></li>
+  <li><a href="#structure-and-fields-from-the-vc-data-model-2.0" id="toc-structure-and-fields-from-the-vc-data-model-2.0" class="nav-link" data-scroll-target="#structure-and-fields-from-the-vc-data-model-2.0"><span class="header-section-number">2.3</span> Structure and Fields from the VC Data Model 2.0</a></li>
+  <li><a href="#example-sport-specific-credential" id="toc-example-sport-specific-credential" class="nav-link" data-scroll-target="#example-sport-specific-credential"><span class="header-section-number">2.4</span> Example Sport Specific Credential</a></li>
+  <li><a href="#creating-the-club-specific-context" id="toc-creating-the-club-specific-context" class="nav-link" data-scroll-target="#creating-the-club-specific-context"><span class="header-section-number">2.5</span> Creating the Club Specific <code>@context</code></a></li>
+  </ul></li>
+  <li><a href="#signatures-keys-and-cryptosuites-oh-my" id="toc-signatures-keys-and-cryptosuites-oh-my" class="nav-link" data-scroll-target="#signatures-keys-and-cryptosuites-oh-my"><span class="header-section-number">3</span> Signatures, Keys, and Cryptosuites, oh my!</a>
+  <ul class="collapse">
+  <li><a href="#dealing-with-cryptographic-keys" id="toc-dealing-with-cryptographic-keys" class="nav-link" data-scroll-target="#dealing-with-cryptographic-keys"><span class="header-section-number">3.1</span> Dealing with Cryptographic Keys</a>
+  <ul class="collapse">
+  <li><a href="#generating-key-pairs" id="toc-generating-key-pairs" class="nav-link" data-scroll-target="#generating-key-pairs"><span class="header-section-number">3.1.1</span> Generating Key Pairs</a></li>
+  <li><a href="#sharing-public-keys-dids" id="toc-sharing-public-keys-dids" class="nav-link" data-scroll-target="#sharing-public-keys-dids"><span class="header-section-number">3.1.2</span> Sharing Public keys: DIDs</a></li>
+  </ul></li>
+  <li><a href="#choosing-a-cryptosuite" id="toc-choosing-a-cryptosuite" class="nav-link" data-scroll-target="#choosing-a-cryptosuite"><span class="header-section-number">3.2</span> Choosing a Cryptosuite</a></li>
+  </ul></li>
+  <li><a href="#credential-issuance" id="toc-credential-issuance" class="nav-link" data-scroll-target="#credential-issuance"><span class="header-section-number">4</span> Credential Issuance</a>
+  <ul class="collapse">
+  <li><a href="#proof-options-additional-structure-and-fields-from-data-integrity-1.0" id="toc-proof-options-additional-structure-and-fields-from-data-integrity-1.0" class="nav-link" data-scroll-target="#proof-options-additional-structure-and-fields-from-data-integrity-1.0"><span class="header-section-number">4.1</span> Proof Options: Additional Structure and Fields from Data Integrity 1.0</a></li>
+  </ul></li>
+  <li><a href="#credential-verification" id="toc-credential-verification" class="nav-link" data-scroll-target="#credential-verification"><span class="header-section-number">5</span> Credential Verification</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">6</span> References</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">VC Data Integrity Tutorial</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dr.&nbsp;Greg M. Bernstein and others? </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>This document provides a tutorial introduction to W3C verifiable credentials to allow non-profit school or community clubs to cooperate with each in a timely and privacy enhancing way via the issuance and verification of <em>verifiable credentials</em>. We will illustrating the use of the following W3C <strong>specifications</strong>:</p>
+<ul>
+<li>Verifiable Credential Data Model 2.0 <span class="citation" data-cites="VC-DM2.0"><a href="#ref-VC-DM2.0" role="doc-biblioref">[1]</a></span></li>
+<li>Verifiable Credential Data Integrity 1.0 <span class="citation" data-cites="VC-DI1.0"><a href="#ref-VC-DI1.0" role="doc-biblioref">[2]</a></span></li>
+<li>JSON-LD-1.1 <span class="citation" data-cites="JSON-LD-1.1"><a href="#ref-JSON-LD-1.1" role="doc-biblioref">[3]</a></span></li>
+</ul>
+<p>In addition we will go through the decision process in selecting the appropriate <strong>cryptosuite</strong> from among:</p>
+<ul>
+<li>Data Integrity EdDSA Cryptosuites v1.0 <span class="citation" data-cites="VC-DI-EdDSA"><a href="#ref-VC-DI-EdDSA" role="doc-biblioref">[4]</a></span></li>
+<li>Data Integrity ECDSA Cryptosuites v1.0 <span class="citation" data-cites="VC-DI-ECDSA"><a href="#ref-VC-DI-ECDSA" role="doc-biblioref">[5]</a></span></li>
+</ul>
+<section id="cooperating-schoolcommunity-clubs-use-case" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="cooperating-schoolcommunity-clubs-use-case"><span class="header-section-number">1.1</span> Cooperating School/Community Clubs Use Case</h2>
+<p>Suppose that we have two community hiking clubs (purely fictitious): <em>The Arcata Tall Trees Hiking Club</em> <a href="#fig-tall" class="quarto-xref">Figure&nbsp;1 (a)</a> and the <em>White Mountain Old Trees Hiking Club</em> <a href="#fig-old" class="quarto-xref">Figure&nbsp;1 (b)</a>. Both clubs exists to promote the “great outdoors”, hiking safety, and comraderie.</p>
+<div id="fig-HikingClubs" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-HikingClubs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-HikingClubs" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-tall" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-tall-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="CoastRedwood.jpg" class="img-fluid figure-img" data-ref-parent="fig-HikingClubs">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-tall-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) The tallest trees (Coast Redwoods)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-HikingClubs" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-old" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-old-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="BristleconePine.jpg" class="img-fluid figure-img" data-ref-parent="fig-HikingClubs">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-old-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) The oldest trees (Bristlecone pine)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-HikingClubs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Two Different Hiking Clubs
+</figcaption>
+</figure>
+</div>
+<p>When teaching begining and intermediate website development to computer science majors one of the authors of this tutorial would have students create a website for a real or fictional school or community club of their choosing, such as a hiking club, a guitar club, a cooking club etc… They would develop this website from a simple static HTML page to a full front-end/back-end server based application with logins for club members and club officers with different views and club management capabilities based on membership/officer status. A partially complete example club is the <a href="https://bawfc.grotto-networking.com/index.html">Bay Area Windsurf Foiling Club</a>. This tutorial goes one step further and adds the ability to issue verifiable credentials to its members so that they can participate in someway with a different club that has some kind of reciprocity agreement.</p>
+<p>To make the club interesting from a credential perspective the club should certify knowledge or skills of a member. We assume the club has a website and member data base of some sort. Clubs can get quite elaborate with loaner equipment for members, events (open to all, open only to members, members paid, etc.), rating system, required volunteer work, etc. An example of such a club is the <a href="https://www.cal-sailing.org/">Cal Sailing Club</a> a university club that morphed into a community club which has an extensive training program, collection of boats and windsurfers, and runs a number of events every year.</p>
+<section id="why-bother-with-verifiable-credentials" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="why-bother-with-verifiable-credentials"><span class="header-section-number">1.1.1</span> Why Bother with Verifiable Credentials?</h3>
+<p>Hiking club example. Member status. Knowledge certification. Skills certification. Each club has separate member databases which for privacy reasons do not share with the other club. If only a single club then a “hike leader” could check the club database. Other mechanisms could include one club sending email to another or calling the other. These are not as timely as a current credential and sacrifice privacy. “Now we know that he/she is participating with that other club…”</p>
+</section>
+</section>
+</section>
+<section id="club-credential-specification" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Club Credential Specification</h1>
+<p>In this section we Start with domain specific knowledge of the club, review the popular JSON data exchange “language” and tools, bring in basic structure from the VC Data Model 2.0 <span class="citation" data-cites="VC-DM2.0"><a href="#ref-VC-DM2.0" role="doc-biblioref">[1]</a></span>, and then add a custom “context” to define our club’s credential.</p>
+<section id="club-specific-domain-knowledge" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="club-specific-domain-knowledge"><span class="header-section-number">2.1</span> Club Specific Domain Knowledge</h2>
+<p>As we will see in the following sections that the verifiable credentials data model 2.0 <span class="citation" data-cites="VC-DM2.0"><a href="#ref-VC-DM2.0" role="doc-biblioref">[1]</a></span> provides a well thought out structure for credentials of any type. However, domain knowledge about the club is needed to actually define the details of the credentials.</p>
+<p>In this section I’m going to assume a wind sport club that includes multiple disciplines (sailing, windsurfing, etc.) since at one time I actually was a member of such a club.</p>
+<p>One of the first questions that comes up is how best to organize the credentials for the club? Given that this wind sport club has many disciplines: (a) dinghy sailing, (b) keel boat sailing, (c) windsurfing, (d) windsurf foiling, (e) wing foiling; should we have one credential with lots of properties, or lots of separate credentials, or something in between, e.g., membership credential and sport specific credentials? Since verifiable credentials are kept in digital wallets rather than physical wallets, more credentials from the same issuer isn’t necessarily a big problem. For example the <a href="https://www.imsglobal.org/spec/ob/v3p0/">Open Badges Specification Spec Version 3.0</a> based on VC DM 2.0 emphasizes a single <em>achievement</em> (see <a href="https://www.1edtech.org/standards/open-badges">Open Badges Overview</a>). While the <a href="https://www.imsglobal.org/spec/clr/v2p0">Comprehensive Learner Record Standard Spec Version 2.0</a> features a list of <em>achievements</em>, e.g.&nbsp;all the courses completed on the way to a academic degree.</p>
+<p>My inclination is to have credentials specific to the club’s distinct disciplines allowing for some redundancy if someone earns credentials in multiple disciplines. Here are other notions:</p>
+<ol type="1">
+<li>Membership: are their dues currently paid. Natural expiration date, covered by dues period. This would tend to be a much shorter period of time than for knowledge or skill expiration.</li>
+<li>Knowledge competency (written):
+<ol type="1">
+<li>General Knowledge: Dock etiquet, Tides and Currents, Wind conditions, Boundaries for skill levels. Note: dock etiquet (shared use of docks) can change if some docks are out of service. Youth classes are being held, etc… The others would tend not to change much over time.</li>
+<li>Sport and Equipment Specific Knowlege (Beginner, Intermediate, and Advanced)
+<ol type="1">
+<li>Dinghy Sailing: Hoist usage, rigging of specific boat types.</li>
+<li>Windsurfing: equipment familiarity (terminology), board set up. Rigging</li>
+<li>Windsurf foiling: equipment familiarity, foil setup, rigging</li>
+<li>Wing foiling: equipment familiarity, foil setup, wing setup and care.</li>
+</ol></li>
+<li>Sport Specific Skills
+<ol type="1">
+<li>Dinghy sailing: Junior Skipper (Docking, tacking, jibing, man-over-board, capsize and recovery)</li>
+<li>Windsurfing: Beginner (board paddling to return to dock), Junior: Sail in 10mph or less wind around buoy X in cove and return to dock; Intermediate: sail in 10-15mph wind around buoy Y and return; Advanced: Sail in 15-25mph wind around buoy Z and return.</li>
+<li>Windsurf foiling: must be <em>advanced</em> windsurfer. Intermediate sustained foiling for 30 seconds or more. Advanced: demonstrate successful foiling jibe. Distance cruising from Berkeley: (a) Treasure Island, (b) R2 Buoy (above TI), (c) R4 Buoy (off Angel Island), (d) Blossom Rock Buoy, (e) Alcatraz rounding, (f) Harding Rock Buoy, (f) Golden Gate Bridge (and back!).</li>
+<li>Wing foiling: etc…</li>
+</ol></li>
+</ol></li>
+</ol>
+<p>Now there are also a number of things a club might need to know about you that do <strong>not</strong> need to be in a credential such as (a) phone number, (b) address, (c) emergency contact information, (d) student status, etc…</p>
+</section>
+<section id="json-for-everything" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="json-for-everything"><span class="header-section-number">2.2</span> JSON for Everything!</h2>
+<section id="data-modeling-and-exchange-json" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="data-modeling-and-exchange-json"><span class="header-section-number">2.2.1</span> Data Modeling and Exchange: JSON</h3>
+<p><a href="https://www.json.org/json-en.html">JSON</a>:</p>
+<blockquote class="blockquote">
+<p>JSON (JavaScript Object Notation) is a lightweight data-interchange format. It is easy for humans to read and write. It is easy for machines to parse and generate. It is based on a subset of the JavaScript Programming Language Standard ECMA-262 3rd Edition - December 1999. JSON is a text format that is completely language independent but uses conventions that are familiar to programmers of the C-family of languages, including C, C++, C#, Java, JavaScript, Perl, Python, and many others. These properties make JSON an ideal data-interchange language.</p>
+</blockquote>
+<p>JSON is the text based data “lingua franca” for the web. I would teach this early (week 4) in a first web programming class for CS majors. See <a href="https://www.grotto-networking.com/WebsiteDevelopment/files/lectures/Misc/JSON.html#/title-slide">JSON Slides</a>.</p>
+<p><a href="#lst-JSONVC" class="quarto-xref">Listing&nbsp;1</a> is an example of an JSON based credential from <span class="citation" data-cites="VC-DM2.0"><a href="#ref-VC-DM2.0" role="doc-biblioref">[1]</a></span>:</p>
+<div id="lst-JSONVC" class="javascript listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-JSONVC-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;1: Simple verifiable credential in JSON format.
+</figcaption>
+<div aria-describedby="lst-JSONVC-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb1"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"@context"</span><span class="op">:</span> [</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.w3.org/ns/credentials/v2"</span><span class="op">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.w3.org/ns/credentials/examples/v2"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"id"</span><span class="op">:</span> <span class="st">"http://university.example/credentials/58473"</span><span class="op">,</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"type"</span><span class="op">:</span> [<span class="st">"VerifiableCredential"</span><span class="op">,</span> <span class="st">"ExampleAlumniCredential"</span>]<span class="op">,</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"issuer"</span><span class="op">:</span> <span class="st">"did:example:2g55q912ec3476eba2l9812ecbfe"</span><span class="op">,</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"validFrom"</span><span class="op">:</span> <span class="st">"2010-01-01T00:00:00Z"</span><span class="op">,</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"credentialSubject"</span><span class="op">:</span> {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span><span class="op">:</span> <span class="st">"did:example:ebfeb1f712ebc6f1c276e12ec21"</span><span class="op">,</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"alumniOf"</span><span class="op">:</span> {</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"id"</span><span class="op">:</span> <span class="st">"did:example:c276e12ec21ebfeb1f712ebc6f1"</span><span class="op">,</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"name"</span><span class="op">:</span> <span class="st">"Example University"</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+</section>
+<section id="data-validation-json-schema" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="data-validation-json-schema"><span class="header-section-number">2.2.2</span> Data Validation: JSON-Schema</h3>
+<p>JSON is great for modeling almost any data structure imaginable. However most applications only wants certain types of data in a particular format, i.e., a small subset of possible JSON structures and content. Typically the structure and type of data is specified by a <strong><em>schema</em></strong> of some kind.</p>
+<p>From <a href="https://json-schema.org/">JSON-Schema</a>:</p>
+<blockquote class="blockquote">
+<p>While JSON is probably the most popular format for exchanging data, JSON Schema is the vocabulary that enables JSON data consistency, validity, and interoperability at scale. JSON Schema is a declarative language for annotating and validating JSON documents’ structure, constraints, and data types</p>
+</blockquote>
+<p>In addition a JSON-Schema is specified via JSON! I Would teach this in a second web development course for use in data validation. <a href="https://www.grotto-networking.com/WebsiteDevelopment/files/lectures/Misc/JSON-Schema.html">JSON-Schema Slides</a>.</p>
+<p>I use JSON-Scheme in multiple places in my open source <a href="https://github.com/Wind4Greg/Server-for-VCs">VC interoperability test server</a>. <a href="#lst-Schema" class="quarto-xref">Listing&nbsp;2</a> shows an example that does some basic checks on a verifiable credential.</p>
+<div id="lst-Schema" class="javascript listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-Schema-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;2: Basic Schema to check a credential.
+</figcaption>
+<div aria-describedby="lst-Schema-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb2"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>     <span class="st">"$id"</span><span class="op">:</span> <span class="st">"https://grotto-networking.com/simple-credential.schema.json"</span><span class="op">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>     <span class="st">"title"</span><span class="op">:</span> <span class="st">"UnsignedCredential"</span><span class="op">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     <span class="st">"description"</span><span class="op">:</span> <span class="st">"A basic credential validator, data model v1.1 or v2.0"</span><span class="op">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>     <span class="st">"type"</span><span class="op">:</span> <span class="st">"object"</span><span class="op">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>     <span class="st">"properties"</span><span class="op">:</span> {</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>          <span class="st">"@context"</span><span class="op">:</span> {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>               <span class="st">"type"</span><span class="op">:</span> <span class="st">"array"</span><span class="op">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>               <span class="st">"items"</span><span class="op">:</span> {</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"type"</span><span class="op">:</span> [<span class="st">"string"</span><span class="op">,</span> <span class="st">"object"</span>]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>               }</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>          }<span class="op">,</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>          <span class="st">"id"</span><span class="op">:</span> {</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"type"</span><span class="op">:</span> <span class="st">"string"</span><span class="op">,</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>               <span class="st">"format"</span><span class="op">:</span> <span class="st">"uri"</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>          }<span class="op">,</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>          <span class="st">"type"</span><span class="op">:</span> {</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>               <span class="st">"type"</span><span class="op">:</span> [<span class="st">"string"</span><span class="op">,</span> <span class="st">"array"</span>]</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>          }<span class="op">,</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>          <span class="st">"credentialSubject"</span><span class="op">:</span> {</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>               <span class="st">"type"</span><span class="op">:</span> [<span class="st">"object"</span><span class="op">,</span> <span class="st">"array"</span>]</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>          }<span class="op">,</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>          <span class="st">"issuer"</span><span class="op">:</span> {</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>               <span class="st">"anyOf"</span><span class="op">:</span> [</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                    {</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"type"</span><span class="op">:</span> <span class="st">"string"</span><span class="op">,</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"format"</span><span class="op">:</span> <span class="st">"uri"</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>                    }<span class="op">,</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                    {</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"type"</span><span class="op">:</span> <span class="st">"object"</span><span class="op">,</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"properties"</span><span class="op">:</span> {</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"id"</span><span class="op">:</span> {</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"type"</span><span class="op">:</span> <span class="st">"string"</span><span class="op">,</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"format"</span><span class="op">:</span> <span class="st">"uri"</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>                              }</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>                         }<span class="op">,</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"required"</span><span class="op">:</span> [<span class="st">"id"</span>]</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>                    }</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>               ]</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>          }<span class="op">,</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>          <span class="st">"credentialStatus"</span><span class="op">:</span> {</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>               <span class="st">"type"</span><span class="op">:</span> <span class="st">"object"</span><span class="op">,</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>               <span class="st">"properties"</span><span class="op">:</span> {</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"id"</span><span class="op">:</span> {</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"type"</span><span class="op">:</span> <span class="st">"string"</span><span class="op">,</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"format"</span><span class="op">:</span> <span class="st">"uri"</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>                    }<span class="op">,</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"type"</span><span class="op">:</span> {</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"type"</span><span class="op">:</span> [<span class="st">"string"</span><span class="op">,</span> <span class="st">"array"</span>]</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>                    }</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>               }<span class="op">,</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>               <span class="st">"required"</span><span class="op">:</span> [<span class="st">"type"</span>]</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>     }<span class="op">,</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>     <span class="st">"required"</span><span class="op">:</span> [<span class="st">"@context"</span><span class="op">,</span> <span class="st">"type"</span><span class="op">,</span> <span class="st">"credentialSubject"</span><span class="op">,</span> <span class="st">"issuer"</span>]</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+<p>To actually perform checks of JSON document against a JSON-Schema, optimized code libraries are used. I use and would have my students use <a href="https://www.npmjs.com/package/ajv">npm: AJV</a>. In the figure below we show the <a href="https://www.npmjs.com/package/ajv">NPM</a> page for AJV, as you can see from the weekly download numbers (100M+) JSON-Schema for input validation is extremely popular.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="AJV-JSON-Schema.png" class="img-fluid figure-img"></p>
+<figcaption>AJV NPM page</figcaption>
+</figure>
+</div>
+</section>
+<section id="but-what-does-it-mean-json-ld" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="but-what-does-it-mean-json-ld"><span class="header-section-number">2.2.3</span> But What Does it mean: JSON-LD</h3>
+<p>From <span class="citation" data-cites="JSON-LD-1.1"><a href="#ref-JSON-LD-1.1" role="doc-biblioref">[3]</a></span>: In addition to all the features JSON provides, JSON-LD introduces:</p>
+<ul>
+<li>a universal identifier mechanism for JSON objects via the use of IRIs,</li>
+<li>a way to disambiguate <em>keys</em> shared among different JSON documents by mapping them to IRIs via a <strong>context</strong>,</li>
+<li>a mechanism in which a value in a JSON object may refer to a resource on a different site on the Web,</li>
+<li>the ability to annotate strings with their language,</li>
+<li>a way to associate datatypes with values such as dates and times,</li>
+<li>and a facility to express one or more directed graphs, such as a social network, in a single document.</li>
+</ul>
+<p>Let’s focus on the second bullet “a way to disambiguate keys”. Consider the credential for a “mystery club” shown in <a href="#lst-Poles" class="quarto-xref">Listing&nbsp;3</a>.</p>
+<div id="lst-Poles" class="javascript listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-Poles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;3: What kind of poles?
+</figcaption>
+<div aria-describedby="lst-Poles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb3"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"@context"</span><span class="op">:</span> [</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.w3.org/ns/credentials/v2"</span><span class="op">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.MysteryClub.org/ns/credentials"</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"id"</span><span class="op">:</span> <span class="st">"http://university.example/credentials/58473"</span><span class="op">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"type"</span><span class="op">:</span> [<span class="st">"VerifiableCredential"</span><span class="op">,</span> <span class="st">"MysteryClubEquipmentCredential"</span>]<span class="op">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"issuer"</span><span class="op">:</span> <span class="st">"did:example:2g55q912ec3476eba2l9812ecbfe"</span><span class="op">,</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"validFrom"</span><span class="op">:</span> <span class="st">"2010-01-01T00:00:00Z"</span><span class="op">,</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"credentialSubject"</span><span class="op">:</span> {</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span><span class="op">:</span> <span class="st">"did:example:ebfeb1f712ebc6f1c276e12ec21"</span><span class="op">,</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"equipment"</span><span class="op">:</span> {</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"id"</span><span class="op">:</span> <span class="st">"did:example:c276e12ec21ebfeb1f712ebc6f1"</span><span class="op">,</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"poles"</span><span class="op">:</span> <span class="st">"Some kind of pole"</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+<p>In <a href="#lst-Poles" class="quarto-xref">Listing&nbsp;3</a> we see that “mystery club” has issued a credential about <em>equipment</em> to a <em>credential subject</em>. We see that subject has a key denoted <em>poles</em>. But what does this mean? (a) hiking poles, (b) treking poles, (c) spinaker pole, (d) poles for pole-vaulting, (e) alpine ski poles, (f) cross country ski poles, (g) gondolier pole, etc… What we are missing is <em>context</em>! Figuratively and literally JSON-LD enables us to clearly define what our <em>terms</em> mean via a <code>@context</code> which is a JSON document that maps <em>keys</em> to long form, unique terms that can be documented. In the following we’ll look at keys/terms that we get from the VC Data Model 2.0 <em>context</em> and the Data Integrity 1.0 <em>context</em>, then we’ll define a custome context for our club.</p>
+</section>
+</section>
+<section id="structure-and-fields-from-the-vc-data-model-2.0" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="structure-and-fields-from-the-vc-data-model-2.0"><span class="header-section-number">2.3</span> Structure and Fields from the VC Data Model 2.0</h2>
+<p>The VC Data Model 2.0 <span class="citation" data-cites="VC-DM2.0"><a href="#ref-VC-DM2.0" role="doc-biblioref">[1]</a></span> provides us with the following required and optional structure as shown below. Note that the <em>comments</em> <code>//</code> are not legal JSON syntax but are included here to explain the contents in a compact manner. As seen in <a href="#lst-VCDMAnnotated" class="quarto-xref">Listing&nbsp;4</a> below:</p>
+<div id="lst-VCDMAnnotated" class="javascript listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-VCDMAnnotated-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;4: Annotated VC Data Model example.
+</figcaption>
+<div aria-describedby="lst-VCDMAnnotated-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb4"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"@context"</span><span class="op">:</span> [</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.w3.org/ns/credentials/v2"</span><span class="op">,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.mysailclub.org/ns/credentials"</span> <span class="co">// Our context will go here</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"id"</span><span class="op">:</span> <span class="st">"http://university.example/credentials/58473"</span><span class="op">,</span> <span class="co">// optional, id of the VC</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"name"</span><span class="op">:</span> <span class="st">"The name of this credential"</span><span class="op">,</span> <span class="co">// optional</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"description"</span><span class="op">:</span> <span class="st">"A description of the credential"</span><span class="op">,</span> <span class="co">// optional</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"type"</span><span class="op">:</span> [<span class="st">"VerifiableCredential"</span><span class="op">,</span> <span class="st">"WaterClubCredential"</span>]<span class="op">,</span> <span class="co">// required</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"issuer"</span><span class="op">:</span> { <span class="co">// required, Specify the issuer nicely</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span><span class="op">:</span> <span class="st">"https://mysailclub.org"</span><span class="op">,</span> <span class="co">// club IRI (but also URL)</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"name"</span><span class="op">:</span> <span class="st">"My Wind Sports Club"</span><span class="op">,</span> <span class="co">// issuer name</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"description"</span><span class="op">:</span> <span class="st">"A public or school based wind sports club."</span> <span class="co">// optional issuer desc</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"validFrom"</span><span class="op">:</span> <span class="st">"2010-01-01T00:00:00Z"</span><span class="op">,</span> <span class="co">// optional</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"validUntil"</span><span class="op">:</span> <span class="st">"2020-01-01T19:23:24Z"</span><span class="op">,</span> <span class="co">// optional</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"credentialSubject"</span><span class="op">:</span> { <span class="co">// required</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span><span class="op">:</span> <span class="st">"did:example:ebfeb1f712ebc6f1c276e12ec21"</span><span class="op">,</span> <span class="co">// optional, id of the subject</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Here is where all the custom stuff will go</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+</section>
+<section id="example-sport-specific-credential" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="example-sport-specific-credential"><span class="header-section-number">2.4</span> Example Sport Specific Credential</h2>
+<p>I’m going to work somewhat backwards and will start with a fairly rich example for the wind sport discipline of “windsurf foiling” and then use that to guide the development of the corresponding <code>@context</code>. My first attempt is shown in <a href="#lst-Windsurf" class="quarto-xref">Listing&nbsp;5</a>.</p>
+<div id="lst-Windsurf" class="javascript listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-Windsurf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;5: Windsurf foiling (sport) specific credential.
+</figcaption>
+<div aria-describedby="lst-Windsurf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb5"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"@context"</span><span class="op">:</span> [</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.w3.org/ns/credentials/v2"</span><span class="op">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://bawfc.grotto-networking.com/credentials"</span> <span class="co">// Where I should be a copy of the context</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"name"</span><span class="op">:</span> <span class="st">"Bay Area Windsurf Foiling Credential"</span><span class="op">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"description"</span><span class="op">:</span> <span class="st">"Denotes membership, knowledge, and skills in windsurf foiling"</span><span class="op">,</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"type"</span><span class="op">:</span> [<span class="st">"VerifiableCredential"</span><span class="op">,</span> <span class="st">"WindFoilCredential"</span>]<span class="op">,</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"issuer"</span><span class="op">:</span> { <span class="co">// Specify the issuer nicely</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span><span class="op">:</span> <span class="st">"https://bawfc.grotto-networking.com"</span><span class="op">,</span> <span class="co">// club IRI (but also URL)</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"name"</span><span class="op">:</span> <span class="st">"Bay Area Windsurf Foiling Club"</span><span class="op">,</span> <span class="co">// issuer name</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"description"</span><span class="op">:</span> <span class="st">"Not a real club, but real information"</span> <span class="co">// issuer desc</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">// "validFrom": "2010-01-01T00:00:00Z",  // Not using TMI</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">// "validUntil": "2020-01-01T19:23:24Z", // Not using different parts expire differently</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"credentialSubject"</span><span class="op">:</span> {</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// "id": "did:example:ebfeb1f712ebc6f1c276e12ec21", // not using</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Here is where all the custom stuff will go</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"membership"</span><span class="op">:</span> <span class="co">// Related to dues</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"start"</span><span class="op">:</span> <span class="st">"2025-03-01T00:00:00Z"</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"end"</span><span class="op">:</span> <span class="st">"2025-10-31T00:00:00Z"</span>}<span class="op">,</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"knowledge"</span><span class="op">:</span> [ {<span class="st">"topic"</span><span class="op">:</span> <span class="st">"DockEtiquette"</span><span class="op">,</span> <span class="st">"date"</span><span class="op">:</span> <span class="st">"1984-01-01T00:00:00Z"</span>}</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"topic"</span><span class="op">:</span> <span class="st">"TidesAndCurrents"</span><span class="op">,</span> <span class="st">"date"</span><span class="op">:</span> <span class="st">"2010-01-01T00:00:00Z"</span>}<span class="op">,</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"topic"</span><span class="op">:</span> <span class="st">"WindPatterns"</span><span class="op">,</span> <span class="st">"date"</span><span class="op">:</span> <span class="st">"2010-01-01T00:00:00Z"</span>}<span class="op">,</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"topic"</span><span class="op">:</span> <span class="st">"LandMarksBuoys"</span><span class="op">,</span> <span class="st">"date"</span><span class="op">:</span> <span class="st">"2010-01-01T00:00:00Z"</span>}<span class="op">,</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"topic"</span><span class="op">:</span> <span class="st">"BigBoatsFerries"</span><span class="op">,</span> <span class="st">"date"</span><span class="op">:</span> <span class="st">"2010-01-01T00:00:00Z"</span>}</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    ]<span class="op">,</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"skills"</span><span class="op">:</span> [{<span class="st">"name"</span><span class="op">:</span> <span class="st">"Rigging"</span><span class="op">,</span> <span class="st">"date"</span><span class="op">:</span><span class="st">"2010-01-01T00:00:00Z"</span>}<span class="op">,</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span><span class="op">:</span> <span class="st">"FoilSetup"</span><span class="op">,</span> <span class="st">"date"</span><span class="op">:</span> <span class="st">"2017-01-01T00:00:00Z"</span>}</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    ]<span class="op">,</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">"distanceAchiements"</span><span class="op">:</span> [{<span class="st">"name"</span><span class="op">:</span> <span class="st">"TI"</span><span class="op">,</span> <span class="st">"date"</span><span class="op">:</span> <span class="st">"2010-01-01T00:00:00Z"</span>}<span class="op">,</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span><span class="op">:</span> <span class="st">"R2"</span><span class="op">,</span> <span class="st">"date"</span><span class="op">:</span> <span class="st">"2011-01-01T00:00:00Z"</span>}</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+</section>
+<section id="creating-the-club-specific-context" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="creating-the-club-specific-context"><span class="header-section-number">2.5</span> Creating the Club Specific <code>@context</code></h2>
+<p>The above example credential may need a bit of clean up. The <code>name</code> key may not be able to be redefined. In general every term (key) used in our example and not part of the VC DM2 needs to be defined in our club specific context. These include: <em>membership</em>, <em>start</em>, <em>end</em>, <em>knowledge</em>, <em>topic</em>, <em>date</em>, <em>skills</em>, <em>name</em>, <em>distanceAchiements</em>. Note that I’ve reused <em>name</em> and <em>date</em> in multiple places. Is this bad?</p>
+<p>I was getting errors on redefining <em>name</em> so revised the example credential from <a href="#lst-Windsurf" class="quarto-xref">Listing&nbsp;5</a> to look like that shown in <a href="#lst-Windsurf2" class="quarto-xref">Listing&nbsp;6</a>.</p>
+<div id="lst-Windsurf2" class="json listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-Windsurf2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;6: Windsurf foiling (sport) specific credential again.
+</figcaption>
+<div aria-describedby="lst-Windsurf2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb6"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"@context"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.w3.org/ns/credentials/v2"</span><span class="ot">,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://bawfc.grotto-networking.com/credentials"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a> <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"Bay Area Windsurf Foiling Credential"</span><span class="fu">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Denotes membership, knowledge, and skills in windsurf foiling"</span><span class="fu">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"type"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"VerifiableCredential"</span><span class="ot">,</span> <span class="st">"WindFoilCredential"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"issuer"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com"</span><span class="fu">,</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"Bay Area Windsurf Foiling Club"</span><span class="fu">,</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Not a real club, but real information!"</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"credentialSubject"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"Member"</span><span class="ot">,</span> <span class="st">"WindsurfFoiler"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"membership"</span><span class="fu">:</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span><span class="dt">"start"</span><span class="fu">:</span> <span class="st">"2025-03-01T00:00:00Z"</span><span class="fu">,</span> <span class="dt">"end"</span><span class="fu">:</span> <span class="st">"2025-10-31T00:00:00Z"</span><span class="fu">},</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"knowledge"</span><span class="fu">:</span> <span class="ot">[</span> <span class="fu">{</span><span class="dt">"topic"</span><span class="fu">:</span> <span class="st">"DockEtiquette"</span><span class="fu">,</span> <span class="dt">"date"</span><span class="fu">:</span> <span class="st">"1984-01-01T00:00:00Z"</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span><span class="dt">"topic"</span><span class="fu">:</span> <span class="st">"TidesAndCurrents"</span><span class="fu">,</span> <span class="dt">"date"</span><span class="fu">:</span> <span class="st">"2010-01-01T00:00:00Z"</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span><span class="dt">"topic"</span><span class="fu">:</span> <span class="st">"WindPatterns"</span><span class="fu">,</span> <span class="dt">"date"</span><span class="fu">:</span> <span class="st">"2010-01-01T00:00:00Z"</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span><span class="dt">"topic"</span><span class="fu">:</span> <span class="st">"LandMarksBuoys"</span><span class="fu">,</span> <span class="dt">"date"</span><span class="fu">:</span> <span class="st">"2010-01-01T00:00:00Z"</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span><span class="dt">"topic"</span><span class="fu">:</span> <span class="st">"BigBoatsFerries"</span><span class="fu">,</span> <span class="dt">"date"</span><span class="fu">:</span> <span class="st">"2010-01-01T00:00:00Z"</span><span class="fu">}</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"skills"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">"skill"</span><span class="fu">:</span> <span class="st">"Rigging"</span><span class="fu">,</span> <span class="dt">"date"</span><span class="fu">:</span><span class="st">"2010-01-01T00:00:00Z"</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span><span class="dt">"skill"</span><span class="fu">:</span> <span class="st">"FoilSetup"</span><span class="fu">,</span> <span class="dt">"date"</span><span class="fu">:</span> <span class="st">"2017-01-01T00:00:00Z"</span><span class="fu">}</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"distanceAchievements"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">"landmark"</span><span class="fu">:</span> <span class="st">"TI"</span><span class="fu">,</span> <span class="dt">"date"</span><span class="fu">:</span> <span class="st">"2010-01-01T00:00:00Z"</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span><span class="dt">"landmark"</span><span class="fu">:</span> <span class="st">"R2"</span><span class="fu">,</span> <span class="dt">"date"</span><span class="fu">:</span> <span class="st">"2011-01-01T00:00:00Z"</span><span class="fu">}</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+<p>Giving every <em>key</em>/<em>term</em> I introduced a unique URI and a bit of extra info produced my first club specific context shown in <a href="#lst-ContextV1" class="quarto-xref">Listing&nbsp;7</a>. To quickly check for errors I started with this context “embedded” in the example credential and then checked it with the <a href="https://json-ld.org/playground/">JSON-LD Playground</a>.</p>
+<div id="lst-ContextV1" class="json listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-ContextV1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;7: Windsurf foiling specific context version 1.
+</figcaption>
+<div aria-describedby="lst-ContextV1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb7"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"Member"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#Member"</span><span class="fu">,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"WindsurfFoiler"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#Member"</span><span class="fu">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"membership"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#membership"</span><span class="fu">,</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"knowledge"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#knowledge"</span><span class="fu">,</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@container"</span><span class="fu">:</span> <span class="st">"@set"</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"skills"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#skills"</span><span class="fu">,</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@container"</span><span class="fu">:</span> <span class="st">"@set"</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"distanceAchiements"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#distanceAchiements"</span><span class="fu">,</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@container"</span><span class="fu">:</span> <span class="st">"@set"</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"start"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#skills"</span><span class="fu">,</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"end"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#skills"</span><span class="fu">,</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"topic"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#topic"</span><span class="fu">,</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"date"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#skills"</span><span class="fu">,</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"skill"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#skill"</span><span class="fu">,</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"landmark"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#landmark"</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+<p>We can use “type specific” subcontexts to better reflect the separation between a generic <em>Member</em> and a <em>WindsurfFoiler</em> as shown in <a href="#lst-ContextV2" class="quarto-xref">Listing&nbsp;8</a>.</p>
+<div id="lst-ContextV2" class="json listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-ContextV2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;8: Windsurf foiling specific context version 2.
+</figcaption>
+<div aria-describedby="lst-ContextV2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb8"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"@protected"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"Member"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#Member"</span><span class="fu">,</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"membership"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#membership"</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"WindsurfFoiler"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#WindsurfFoiler"</span><span class="fu">,</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"knowledge"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#knowledge"</span><span class="fu">,</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"skills"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#skills"</span><span class="fu">,</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"distanceAchiements"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#distanceAchiements"</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"start"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#start"</span><span class="fu">,</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"end"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#end"</span><span class="fu">,</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"topic"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#topic"</span><span class="fu">,</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"date"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#date"</span><span class="fu">,</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"skill"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#skill"</span><span class="fu">,</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"landmark"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#landmark"</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+<p>And we can further nest our definitions to reflect our design intent with <a href="#lst-ContextV3" class="quarto-xref">Listing&nbsp;9</a>.</p>
+<div id="lst-ContextV3" class="json listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-ContextV3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;9: Windsurf foiling specific context version 3.
+</figcaption>
+<div aria-describedby="lst-ContextV3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb9"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"Member"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#Member"</span><span class="fu">,</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"@protected"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                <span class="dt">"membership"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#membership"</span><span class="fu">,</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@protected"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"start"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#start"</span><span class="fu">,</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">},</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"end"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#end"</span><span class="fu">,</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">}</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">}</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"WindsurfFoiler"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#WindsurfFoiler"</span><span class="fu">,</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"@context"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                <span class="fu">{</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">"knowledge"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#knowledge"</span><span class="fu">,</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@container"</span><span class="fu">:</span> <span class="st">"@set"</span><span class="fu">,</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"@protected"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"topic"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#topic"</span><span class="fu">,</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"date"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>                                <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#date"</span><span class="fu">,</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>                                <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">}</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">}</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">}</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>                <span class="fu">{</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">"skills"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#skills"</span><span class="fu">,</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@container"</span><span class="fu">:</span> <span class="st">"@set"</span><span class="fu">,</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"@protected"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"skill"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#skill"</span><span class="fu">,</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"date"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>                                <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#date"</span><span class="fu">,</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>                                <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">}</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">}</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">}</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>                <span class="fu">{</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">"distanceAchiements"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#distanceAchiements"</span><span class="fu">,</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@container"</span><span class="fu">:</span> <span class="st">"@set"</span><span class="fu">,</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">"@context"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"@protected"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"landmark"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#landmark"</span><span class="fu">,</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>                            <span class="dt">"date"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>                                <span class="dt">"@id"</span><span class="fu">:</span> <span class="st">"https://bawfc.grotto-networking.com/cred/#date"</span><span class="fu">,</span></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>                                <span class="dt">"@type"</span><span class="fu">:</span> <span class="st">"http://www.w3.org/2001/XMLSchema#dateTime"</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">}</span></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">}</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">}</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>            <span class="ot">]</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+</section>
+</section>
+<section id="signatures-keys-and-cryptosuites-oh-my" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Signatures, Keys, and Cryptosuites, oh my!</h1>
+<p>To “secure” a verifiable credential, i.e., to actually make a credential verifiable, requires the use of a digital signature. <a href="https://en.wikipedia.org/wiki/Digital_signature">Digital signatures</a> are a specific type of cryptographic primitive that uses <em>public-key</em> cryptography. Two different keys are used in a digital signature system: (1) a private key is used to sign data, (2) a public key is used to verify the signature on the data.</p>
+<section id="dealing-with-cryptographic-keys" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="dealing-with-cryptographic-keys"><span class="header-section-number">3.1</span> Dealing with Cryptographic Keys</h2>
+<p>A short list of references for dealing with cryptographic keys follows.</p>
+<ul>
+<li><a href="https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final">NIST SP 800-57 Part 1 Recommendation for Key Management: Part 1 – General</a> “This Recommendation provides cryptographic key-management guidance.”, This is <strong><em>the</em></strong> comprehensive reference and is frequently cited in other guides.</li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html">OWASP: Key Management Cheat Sheet</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html">OWASP: Secrets Management Cheat Sheet</a></li>
+</ul>
+<p>NIST SP 800-57 lists 19 different types of cryptographic keys. For issuing credentials for out club we will only be concerned with their first two types:</p>
+<pre><code>1. Private signature key: Private signature keys are the private keys of asymmetric-key
+(public-key) key pairs that are used by public-key algorithms to generate digital signatures
+intended for long-term use. When properly handled, private signature keys can be used to
+provide source authentication and integrity authentication as well as support the non-
+repudiation of messages, documents, or stored data.
+2. Public signature-verification key: A public signature-verification key is the public key of
+an asymmetric-key (public-key) key pair that is used by a public-key algorithm to verify
+digital signatures that are intended to provide source authentication and integrity
+authentication as well as support the non-repudiation of messages, documents, or stored
+data.</code></pre>
+<p>Side note NIST has a separate definition of public/private key pairs for authentication:</p>
+<pre><code>4. Private authentication key: A private authentication key is the private key of an
+asymmetric-key (public-key) key pair that is used with a public-key algorithm to provide
+assurance of the identity of an entity (i.e., identity authentication) when establishing an
+authenticated communication session or authorization to perform some action.
+5. Public authentication key: A public authentication key is the public key of an asymmetric-
+key (public-key) key pair that is used with a public-key algorithm to provide assurance of
+the identity of an entity (i.e., identity authentication) when establishing an authenticated
+communication session or authorization to perform some action.</code></pre>
+<p>NIST SP 800-57 states: “In general, a single key <strong>shall</strong> be used for only one purpose (e.g., encryption, integrity authentication, key wrapping, random bit generation, or digital signatures).”</p>
+<p>It is important to note that our website will be using more than one set of such key pairs and these must not be confused or reused. In particular, for our website their with be a key pair used in <a href="https://en.wikipedia.org/wiki/HTTPS">HTTPS</a> service. This is completely different from the key pair used in signing the club credentials.</p>
+<section id="generating-key-pairs" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="generating-key-pairs"><span class="header-section-number">3.1.1</span> Generating Key Pairs</h3>
+<p>In general the private and public portions of a key pair are generated at the same time as shown in the code snippet</p>
+<div id="lst-KeyGen" class="javascript listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-KeyGen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;10: Simple generation of private and public key pair for a particular cryptographic algorithm.
+</figcaption>
+<div aria-describedby="lst-KeyGen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb12"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> {ed25519} <span class="im">from</span> <span class="st">'@noble/curves/ed25519.js'</span><span class="op">;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> { privateKey<span class="op">,</span> publicKey } <span class="op">=</span> ed25519<span class="op">.</span><span class="fu">keygen</span>()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+<p>The private portion of the key must be <strong>protected</strong> and never revealed! It only needs to be known to our code that will actually run the signing algorithm. The public portion needs to be distributed in a way so that a verifier will have a high assurance that the public key is actually for our club and not an imposter. This is a non-trivial problem and has led to the development of the elaborate <a href="https://en.wikipedia.org/wiki/Public_key_infrastructure">public key infrastructure</a> and to <a href="https://en.wikipedia.org/wiki/Decentralized_identifier">decentralized identifiers (DIDs)</a>.</p>
+<p>Note that you may see a number of different formats for the same key information. In <a href="#lst-KeyFormats" class="quarto-xref">Listing&nbsp;11</a> we show some common formats all for the same public/private pair.</p>
+<div id="lst-KeyFormats" class="javascript listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-KeyFormats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;11: Different encodings for private and public keys.
+</figcaption>
+<div aria-describedby="lst-KeyFormats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb13"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">privateKeyHex</span><span class="op">:</span> <span class="st">"4b49e4ec275c7590d39672508b2717c2dc1dc015e50a5d064732742413c810e0"</span><span class="op">,</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">publicKeyHex</span><span class="op">:</span> <span class="st">"419d02f127a4703ee3e09d071a1ddf2bd8be891558c5023e64232dc7f255eda4"</span><span class="op">,</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">publicKeyMultibase</span><span class="op">:</span> <span class="st">"z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"</span><span class="op">,</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">privateKeyMultibase</span><span class="op">:</span> <span class="st">"z3u2WHhiUqnajJreS8TQw2M57nMfjr7pD7pbme2M66U6BBgb"</span><span class="op">,</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">didKey</span><span class="op">:</span> <span class="st">"did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+</section>
+<section id="sharing-public-keys-dids" class="level3" data-number="3.1.2">
+<h3 data-number="3.1.2" class="anchored" data-anchor-id="sharing-public-keys-dids"><span class="header-section-number">3.1.2</span> Sharing Public keys: DIDs</h3>
+<p>We are going to use a <em>decentralized identifier</em> (DID) to identify our club. There can be many “types” of DID and one main way that they are differentiated by their <em>method</em>. In short The job of the DID <em>method</em> is to resolve a DID into a <em>DID document</em> and assure the authenticity of that DID document. From <a href="https://www.w3.org/TR/did-1.0/">Decentralized Identifiers (DIDs) v1.0</a>: “A DID method specification MUST specify how a DID resolver uses a DID to resolve a DID document, including how the DID resolver can verify the <strong><em>authenticity</em></strong> of the response.”</p>
+<p><strong><em>Why?</em></strong> The DID document is where we will put the public signing key for the club’s credentials. This needs to be made available in a “reliable maner”, don’t want a malicious party to substitute in their public key and <em>impersonate</em> the real club (and forge club credentials).</p>
+<p>Need to discuss DIDs and PKI a bit here. <a href="https://en.wikipedia.org/wiki/Decentralized_identifier">Wikipedia: DID</a>, <a href="https://en.wikipedia.org/wiki/Public_key_infrastructure">Wikipedia: Public Key Infrastructure</a>.</p>
+<p>References:</p>
+<ul>
+<li><a href="https://www.w3.org/TR/did-1.0/">Decentralized Identifiers (DIDs) v1.0</a></li>
+<li><a href="https://www.w3.org/TR/did-1.1/">Decentralized Identifiers (DIDs) v1.1</a> Working Draft</li>
+<li><a href="https://www.w3.org/TR/did-use-cases/">Use Cases and Requirements for Decentralized Identifiers</a> See section 1.2 “Concepts of Decentralized Identity” for a short overview of the roles of <em>controller</em>, <em>requesting party</em>, <em>subject</em>.</li>
+</ul>
+<p>For testing purposes the <a href="https://w3c-ccg.github.io/did-key-spec/"><code>did:key</code> DID method</a> is the easiest to use since the value of key is embedded in the DID method, e.g., <code>did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj</code> contains an encoded verion of the actual public key value.</p>
+<p><strong><em>Note</em></strong> per <a href="https://w3c-ccg.github.io/did-key-spec/#signature-method-creation-algorithm">section 3.12 of the did:key spec</a> when using a <code>did:key</code> value in the proof options <em>verificationMethod</em> field step 5 states to add a hash (#) character and then the multibase value so a DID key of <code>did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj</code> leads to a <code>verificationMethod: "did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj#z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"</code> updated versions also allow the format: <code>verificationMethod: "did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj#vm"</code> which is less redundant. You may see both in the test vectors in the W3C VC documents.</p>
+<p>For deployment, since we already have a website, we can use the <a href="https://w3c-ccg.github.io/did-method-web/"><code>did:web</code> DID method</a> For that we need a basic DID document such as that shown in <a href="#lst-DIDdoc" class="quarto-xref">Listing&nbsp;12</a>.</p>
+<div id="lst-DIDdoc" class="json listing quarto-float quarto-figure quarto-figure-left anchored">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-DIDdoc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;12: Simple DID document.
+</figcaption>
+<div aria-describedby="lst-DIDdoc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode" id="cb14"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"@context"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"https://www.w3.org/ns/did/v1"</span><span class="ot">,</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"https://w3id.org/security/multikey/v1"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"did:web:bawfc.grotto-networking.com"</span><span class="fu">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"assertionMethod"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"did:web:bawfc.grotto-networking.com#vm"</span><span class="fu">,</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"Multikey"</span><span class="fu">,</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"controller"</span><span class="fu">:</span> <span class="st">"did:web:bawfc.grotto-networking.com"</span><span class="fu">,</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"publicKeyMultibase"</span><span class="fu">:</span> <span class="st">"z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">]</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+<p>How does <code>did:web</code> help with “reliably” getting the club’s public key to a verifier? The DID document (like that shown above) is “resolved” via the <code>did:web</code> method as just another web page on the club’s web site. In particular, if our DID is <code>did:web:bawfc.grotto-networking.com:signpubkey</code> then the above DID document would be obtain by getting the page: <code>https://bawfc.grotto-networking.com/signpubkey/did.json</code>.</p>
+<p>Note that in the resolved URL for the DID document that <code>https</code> is used. This implies that the full power of <a href="https://en.wikipedia.org/wiki/HTTPS">HTTPS</a> and <a href="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</a> which uses the existing <a href="https://en.wikipedia.org/wiki/Public_key_infrastructure">public key infrastructure</a> guarantees the authenticity of the DID document as comming from our club’s website.</p>
+<p><em>One more point</em>: The <em>certificates</em> that we get from <a href="https://letsencrypt.org/">Let’s Encrypt</a> concern public/private key pair for our club’s website that is completely different from the public/private key pair that we use for signing the credentials issued by the club. I noticed that for these sites that the keys/certificates are changed every three months.</p>
+<p>We should note that given a website that the <a href="https://identity.foundation/didwebvh/v1.0/"><code>did:webvh</code> DID method</a> can also be used and contains enhanced functionality for dealing with key changes.</p>
+</section>
+</section>
+<section id="choosing-a-cryptosuite" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="choosing-a-cryptosuite"><span class="header-section-number">3.2</span> Choosing a Cryptosuite</h2>
+<p>Basic review of digital signatures, public key cryptography. Concerned with forgeries!</p>
+</section>
+</section>
+<section id="credential-issuance" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Credential Issuance</h1>
+<section id="proof-options-additional-structure-and-fields-from-data-integrity-1.0" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="proof-options-additional-structure-and-fields-from-data-integrity-1.0"><span class="header-section-number">4.1</span> Proof Options: Additional Structure and Fields from Data Integrity 1.0</h2>
+<p><strong>Important</strong> this also sets up the “proof options” that are used by the DI cryptosuites.</p>
+</section>
+</section>
+<section id="credential-verification" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Credential Verification</h1>
+</section>
+<section id="references" class="level1 unnumbered" data-number="6">
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">6 References</h2><div id="refs" class="references csl-bib-body" data-entry-spacing="0" role="list">
+<div id="ref-VC-DM2.0" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">M. Sporny, T. T. Jr, M. Jones, G. Cohen, and I. Herman, <span>“Verifiable credentials data model v2.0,”</span> W3C, Candidate Recommendation, Feb. 2025. Available: <a href="https://www.w3.org/TR/vc-data-model-2.0/">https://www.w3.org/TR/vc-data-model-2.0/</a></div>
+</div>
+<div id="ref-VC-DI1.0" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">G. Bernstein, M. Sporny, D. Longley, I. Herman, and T. T. Jr, <span>“Verifiable credential data integrity 1.0,”</span> W3C, Candidate Recommendation, Feb. 2025.</div>
+</div>
+<div id="ref-JSON-LD-1.1" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">G. Kellogg, D. Longley, and P.-A. Champin, <span>“<span>JSON</span>-LD <span>1.1</span>,”</span> W3C, {W3C} Recommendation, Jul. 2020.</div>
+</div>
+<div id="ref-VC-DI-EdDSA" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline">T. T. Jr, M. Sporny, and G. Bernstein, <span>“Data integrity <span>EdDSA</span> cryptosuites v1.0,”</span> W3C, Candidate Recommendation, Feb. 2025.</div>
+</div>
+<div id="ref-VC-DI-ECDSA" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[5] </div><div class="csl-right-inline">G. Bernstein, D. Longley, and M. Sporny, <span>“Data integrity <span>ECDSA</span> cryptosuites v1.0,”</span> W3C, Candidate Recommendation, Feb. 2025.</div>
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

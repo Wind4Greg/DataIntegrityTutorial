@@ -1,0 +1,59 @@
+---
+title: "VC Data Integrity Slides"
+author: "Dr. Greg M. Bernstein"
+format: revealjs
+---
+
+# Introduction
+
+## What's This about?
+
+::: {.incremental}
+
+* End to end credential development, issuance, verfification
+* Use [VC Data Model 2.0](https://www.w3.org/TR/vc-data-model-2.0), [JSON-LD 1.1](https://www.w3.org/TR/json-ld11) for credential design
+* Use [VC Data Integrity 1.0](https://www.w3.org/TR/vc-data-integrity) and Specific Cryptosuites to secure, issue and verify
+* Use appropriate DIDs for development and deployment
+
+:::
+
+## Beyond Test Vectors
+
+* All VC DI crypto suites include test vectors
+* [VC-DI-EdDSA 1.0](https://www.w3.org/TR/vc-di-eddsa) includes `eddsa-rdfc-2022` and `eddsa-jcs-2022` suites and has simple and enhanced test vectors as well as test vectors for proof sets and chains.
+* [VC-DI-ECDSA 1.0](https://www.w3.org/TR/vc-di-ecdsa) includes `ecdsa-rdfc-2019`, `ecdsa-jcs-2019`, and `ecdsa-sd-2023` over curves P-256 and P-384 and test vectors.
+
+## Beyond Sample Code and Sample Server
+
+* [EdDSA/ECDSA Test Vectors](https://github.com/Wind4Greg/EdDSA-Test-Vectors) Code used to generate the test vectors (example secured credentials) in the [Data Integrity EdDSA Cryptosuites v1.0](https://w3c.github.io/vc-di-eddsa/) and [Data Integrity ECDSA Cryptosuites v1.0](https://w3c.github.io/vc-di-ecdsa/)
+* [ECDSA-SD and BBS Test Vectors](https://github.com/Wind4Greg/ECDSA-SD-TestVectors) Code used to generate the test vectors (example secured credentials) in the [Data Integrity ECDSA selective disclosure](https://w3c.github.io/vc-di-ecdsa/) and [Data Integrity BBS Cryptosuites v1.0](https://w3c.github.io/vc-di-bbs/)
+* [ECDSA-SD Library](https://github.com/Wind4Greg/ECDSA-SD-Library), [BBS for VC Library](https://github.com/Wind4Greg/BBS-VC-Library)
+* [Server for Verifiable Credentials](https://github.com/Wind4Greg/Server-for-VCs) An example server for issuing and verifying *verifiable credential*. Used to participate in W3C interoperability tests.
+
+## An Example Application of VCs
+
+* Non-governmental
+* Non-profit
+* Small enough for student implementation
+
+# Application: School or Community Club
+
+## A 3rd Semester of Web Development?
+
+::: {.incremental}
+
+1. Basic front end and back end development [Introduction to full stack web development](https://www.grotto-networking.com/WebsiteDevelopment/WebDev.html)
+2. More elaborate access control, security, and validation [Web Systems](https://www.grotto-networking.com/WebSystems/WebSystems.html), [Cybersecurity: An Overview](https://www.grotto-networking.com/CyberSecurity/CyberSec.html)
+3. **Design verifiable credentials, issue and provide for their verification**
+
+:::
+
+## Example Clubs (ficticious)
+
+::: {layout-ncol=2}
+
+![The tallest trees (Coast Redwoods)](CoastRedwood.jpg){#fig-tall}
+
+ ![The oldest trees (Bristlecone pine)](BristleconePine.jpg){#fig-old}
+
+:::
