@@ -1,6 +1,8 @@
 DataIntegrityNotes_files/
 DataIntegrityTutorial_files/
 DataIntegritySlides_files/
+cred_files
+cred.html
 /src/node_modules
 /src/output
 /.quarto/

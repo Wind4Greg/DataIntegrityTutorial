@@ -1,0 +1,90 @@
+---
+title: "Bay Area Windsurf Foiling Club Vocabulary"
+author: "Dr. Greg M. Bernstein"
+toc: true
+number-sections: true
+format: html
+---
+
+# Introduction
+
+This is the vocabulary for the **Bay Area Windsurf Foiling Club**!
+
+![Windsurf Foiling](https://bawfc.grotto-networking.com/images/MikePercyFoiling.jpg)
+
+# Member {#Member}
+
+This **type** covers general things about a club member.
+
+## membership {#membership}
+
+This field is concerned with the time period for the member's dues.
+
+### start {#start}
+
+The first day that the member's dues are considered paid.
+
+### end {#end}
+
+The last day the the member's dues are considered paid.
+
+# WindsurfFoiler {#WindsurfFoiler}
+
+This **type** information more specific to the discipline of windsurf foiling which can be considered a sub-discipline of windsurfing, which can be considered a sub-discipline of sailing.
+
+## knowledge {#knowledge}
+
+*knowledge* is a set of understandings about various *topics*.
+
+### topic {#topic}
+
+A *topic* is a single string identitying a particular area of knowledge. Currently defined topic strings include:
+
+* **DockEtiquette**: Be polite and don't leave your gear on the dock for any longer than necessary. Know hazards of gear and equipment around other dock users.
+* **TidesAndCurrents**: We don't like to run around or get stuck in the mud. Know the advantages and disadvantages of "flood" and "ebb" tides.
+* **WindPatterns**: Know the common wind directions and patterns. Know what a "fade" is. Know what "banding" is and why its not a good thing. Never go out in easterlies!
+* **LandMarksBuoys**: Know the common landmarks and buoys so you can communicate effectively with your fellow sailors.
+* **BigBoatsFerries**: Let's stay alive people! Know the "big boat" traffic lanes in the bay. Know that they cannot stop (well yes, they can in a mile or two!). Know the fast ferry routes and why you always need to pay attention when crossing (yes, they are really fast).
+
+### knowledgeDate {#knowledgeDate}
+
+When was this knowledge *last* demonstrated, i.e., tested.
+
+## skills {#skills}
+
+This is a set of abilities of various types.
+
+### skill {#skill}
+
+A *skill* is a single string identitying a particular ability. Currently defined topic strings include:
+
+* **FoilSetup**
+* **Rigging**
+* **StableFoiling30Seconds**
+* And many more...
+
+### skillDate {#skillDate}
+
+This is the date the *skill* was first demonstrated.
+
+## distanceAchievements {#distanceAcheivements}
+
+Some of our members like to go for long distance sailing sessions. Making ones way to various landmarks and buoys in the bay is an acheivement and point of pride. The *distanceAchievement* set captures these. All are referenced from a starting point of either Berkeley south basin or the Berkeley Yacht Club.
+
+### landmark {#landmark}
+
+*landmark* is a single string denoting the "thing" that was visited or rounded. This uses very location specific jargon as mentioned below:
+
+* Common buoy names/abbreviations "R2", "R4", "BlossomRock", "HardingRock"
+* Common landmark names: "TI" (Treasure Island), "Alcatraz", "Crissy" (Crissy Field beach, San Francisco), "ClipperCove" (Cove in Treasure Island where in olden times Pan Am clipper planes were berthed).
+* Strange club names: "BridgeRun" denotes a trip from Berkeley all the way up and under the Golden Gate Bridge and back. This is not really a "run", since one is working their way up wind all the way to the Golden Gate bridge.
+
+![Bay Chart with GPS track](https://bawfc.grotto-networking.com/images/windsurfing2018-10-17.png)
+
+### distanceDate {#distanceDate}
+
+Any date that the member provides evidence of making the landmark via windsurf foiling. Note that achieving any particular distance goal is complete dependent on weather conditions! This is a wind sport!
+
+
+
+
