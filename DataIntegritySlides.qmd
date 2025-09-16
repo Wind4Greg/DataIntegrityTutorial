@@ -384,3 +384,35 @@ A *topic* is a single string identitying a particular area of knowledge. Current
 When was this knowledge *last* demonstrated, i.e., tested.
 ```
 
+# Cryptosuites and Keys
+
+## VC-DI Cryptosuites
+
+* [Data Integrity EdDSA Cryptosuites v1.0](https://www.w3.org/TR/vc-di-eddsa) contains: "eddsa-jcs-2022", and "eddsa-rdfc-2022" cryptosuites.
+* [Data Integrity ECDSA Cryptosuites v1.0](https://www.w3.org/TR/vc-di-ecdsa/) contains: "ecdsa-jcs-2019", "ecdsa-rdfc-2019", "ecdsa-sd-2023", cryptosuites for both P-256 and P-384 curves.
+* [Data Integrity BBS Cryptosuites v1.0](https://www.w3.org/TR/vc-di-bbs/) contains: "bbs-2023" cryptosuite.
+
+## NIST and Digital Signatures
+
+* [FIPS PUB 186-5: Digital Signature Standard (DSS)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf), February 2023.
+  * Chapter 6: "The Elliptic Curve Digital Signature Algorithm (ECDSA)"
+  * Chapter 7. "The Edwards-Curve Digital Signature Algorithm (EdDSA)"
+* [NIST Special Publication NIST SP 800-186 Recommendations for Discrete Logarithm-based Cryptography: Elliptic Curve Domain Parameters](https://csrc.nist.gov/pubs/sp/800/186/final), February 2023. Defines the specific curves.
+
+## How to Choose the Cryptosuite 1
+
+* No other requirements: Choose EdDSA based signatures, more modern, faster, more rigorous foundation.
+* Older hardware requirements: You may have to use ECDSA.
+* Selective Disclosure: use either "bbs-2023" or "ecdsa-sd-2023"
+
+## How to Choose the Cryptosuite 2
+
+Canonicalization choice?
+
+* Selective disclosure only works with RDFC so no choice if you want SD.
+* For our club we developed a complete `@context` and RDFC takes full advantage of that.
+* However JCS works fine with "regular" EdDSA and ECDSA
+* For our club we choose "eddsa-rdfc-2022"
+
+## Working with Keys
+
