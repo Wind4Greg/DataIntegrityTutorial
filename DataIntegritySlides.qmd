@@ -416,3 +416,88 @@ Canonicalization choice?
 
 ## Working with Keys
 
+## Key Recommendations and Guidelines
+
+* [NIST SP 800-57 Part 1 Recommendation for Key Management: Part 1 – General](https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final) This is ***the*** comprehensive reference and is frequently cited in other guides.
+* NIST SP 800-57 states: "In general, a single key **shall** be used for only one purpose (e.g., encryption, integrity authentication, key wrapping, random bit generation, or digital signatures)."
+* [OWASP: Key Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html)
+
+
+## Types of Cryptographic Keys
+
+<small>NIST SP 800-57 lists 19 different types of cryptographic keys. For issuing credentials for out club we will only be concerned with their first two types:</small>
+
+
+1. **Private signature keys** are the private keys of asymmetric-key
+(public-key) key pairs that are used by public-key algorithms to generate digital signatures
+intended for long-term use...
+2. A **public signature-verification key** is the public key of
+an asymmetric-key (public-key) key pair that is used by a public-key algorithm to verify
+digital signatures that are intended to provide source authentication and integrity
+authentication as well as support the non-repudiation of messages, documents, or stored
+data.
+
+
+## Generating Key Pairs
+
+A digital signature algorithm, such as EdDSA, will provide function (or two) for generating the private and public portions of the key pair. This can be as simple as shown below.
+
+```{.javascript}
+// Key pair generation for EdDSA with the noble/curves library
+import {ed25519} from '@noble/curves/ed25519.js';
+let { privateKey, publicKey } = ed25519.keygen();
+```
+
+## Representing Key Pairs
+
+You may see a number of different formats for the same key information.
+
+```{.javascript}
+{
+    // Hex representation typical used in signature spec.
+    privateKeyHex: "4b49e4ec275c7590d39672508b2717c2dc1dc015e50a5d064732742413c810e0",
+    publicKeyHex: "419d02f127a4703ee3e09d071a1ddf2bd8be891558c5023e64232dc7f255eda4",
+    // Multibase used in lots of higher level specifications
+    publicKeyMultibase: "z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj",
+    privateKeyMultibase: "z3u2WHhiUqnajJreS8TQw2M57nMfjr7pD7pbme2M66U6BBgb",
+    // did:key used in test vectors and interop testing
+    didKey: "did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"
+}
+```
+
+## Signature Security 1
+
+<small>From [VC-DI-EdDSA](https://www.w3.org/TR/vc-di-eddsa/#signature-security-properties) types of signature security</small>
+
+* EUF-CMA (existential unforgeability under chosen message attacks)
+* SUF-CMA (strong unforgeability under chosen message attacks)
+* Binding signature (BS)
+* Strongly Binding signature (SBS)
+
+## Signature Security 2
+
+**EUF-CMA** (*existential unforgeability under chosen message attacks*) is usually the minimal security property required of a signature scheme. It guarantees that any efficient adversary who has the public key $pk$ of the signer and received an arbitrary number of signatures on messages of its choice (in an adaptive manner): $\{m_i, \sigma_i\}_{i=1}^N$, cannot output a valid signature $\sigma^∗$ for a new message $m^∗ \notin \{m_i\}_{i=1}^N$ (except with negligible probability). In case the attacker outputs a valid signature on a new message: $(m^∗, \sigma^∗)$, it is called an *existential forgery*.
+
+## Attacker Focus
+
+* **Not** on "breaking" the signature algorithm
+* **Stealing** private key
+* **Swapping** out the issuer's public key with an imposter's public key (where the imposter has the private key part)
+* Somehow **restricting** the generated private key to a smaller domain of values so that *brute* force approaches become viable.
+
+## Protecting Private Key Portion
+
+* The private portion of the key must be **protected** and never revealed!
+* It only needs to be known to our code that will actually run the signing algorithm.
+* Every website using *HTTPS* uses a private/public key pair and protects its private key!
+
+## Distributing the Public Key Portion
+
+<small>The public portion needs to be distributed in a way so that a verifier will have a high assurance that the public key is actually for our club and not an imposter.</small>
+
+* Distribute the public key directly. Examples: (a) Setting up key based *ssh* access. (b) Setting up [WireGuard VPN tunnel](https://www.wireguard.com/)
+* Use the [public key infrastructure](https://en.wikipedia.org/wiki/Public_key_infrastructure)
+* Use [decentralized identifiers (DIDs)](https://en.wikipedia.org/wiki/Decentralized_identifier).
+
+
+
