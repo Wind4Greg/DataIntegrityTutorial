@@ -499,5 +499,97 @@ You may see a number of different formats for the same key information.
 * Use the [public key infrastructure](https://en.wikipedia.org/wiki/Public_key_infrastructure)
 * Use [decentralized identifiers (DIDs)](https://en.wikipedia.org/wiki/Decentralized_identifier).
 
+## Sharing Public keys with DIDs
+
+<small>References:</small>
+
+* [Use Cases and Requirements for Decentralized Identifiers](https://www.w3.org/TR/did-use-cases/) See section 1.2 "Concepts of Decentralized Identity" for a short overview of the roles of *controller*, *requesting party*, *subject*.
+* [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-1.0/)
+* [`did:key` DID method](https://w3c-ccg.github.io/did-key-spec/)
+* [`did:web` DID method](https://w3c-ccg.github.io/did-method-web/)
+
+
+## `did:key` direct distribution and testing
+
+With the [`did:key` DID method](https://w3c-ccg.github.io/did-key-spec/) the value of key is embedded in the DID method, e.g., `did:key:z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj` contains an encoded verion of the actual public key value.
+
+## `did:key` example use
+
+<small>Test vector from [VC-DI-EdDSA](https://www.w3.org/TR/vc-di-eddsa/#example-signed-credential)</small>
+
+```{.json}
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://www.w3.org/ns/credentials/examples/v2"
+  ],
+  "id": "urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33",
+  "type": [
+    "VerifiableCredential",
+    "AlumniCredential"
+  ],
+  "name": "Alumni Credential",
+  "description": "A minimum viable example of an Alumni Credential.",
+  "issuer": "https://vc.example/issuers/5678",
+  "validFrom": "2023-01-01T00:00:00Z",
+  "credentialSubject": {
+    "id": "did:example:abcdefgh",
+    "alumniOf": "The School of Examples"
+  },
+  "proof": {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "eddsa-rdfc-2022",
+    "created": "2023-02-24T23:36:38Z",
+    "verificationMethod": "did:key:z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2#z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "z2YwC8z3ap7yx1nZYCg4L3j3ApHsF8kgPdSb5xoS1VR7vPG3F561B52hYnQF9iseabecm3ijx4K1FBTQsCZahKZme"
+  }
+}
+```
+
+## Club Website
+
+<small>In previous courses the students would have</small>
+
+* Developed the club website first as a static site
+* Developed a server based site with varying access privledges based on role (guest, member, admin)
+* Provided *secure* login/access to that site over HTTPS
+
+## Club Website and PKI
+
+![BAWFC Certification](BAWFC-Cert.png)
+
+
+## `did:web` since we have HTTPS
+
+* The point of a DID method such as `did:web` is to *resolve* to a DID document.
+* The DID document will contain the public key information
+* It is the responsibility of the DID method to ensure authenticity, i.e., the DID document is actually under the control of the DID.
+
+## Example Club DID document
+
+```{.json}
+{
+  "@context": ["https://www.w3.org/ns/did/v1",
+  "https://w3id.org/security/multikey/v1"],
+  "id": "did:web:bawfc.grotto-networking.com",
+  "assertionMethod": [{
+      "id": "did:web:bawfc.grotto-networking.com#vm",
+      "type": "Multikey",
+      "controller": "did:web:bawfc.grotto-networking.com",
+      "publicKeyMultibase": "z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"
+  }]
+}
+```
+
+## Resolving with `did:web`
+
+* If our DID is `did:web:bawfc.grotto-networking.com:signpubkey` then the above DID document would be obtain by getting the page: `https://bawfc.grotto-networking.com/signpubkey/did.json`.
+
+* Note that in the resolved URL for the DID document that `https` is used. This implies that the full power of [HTTPS](https://en.wikipedia.org/wiki/HTTPS) guarantees the authenticity of the DID document as comming from our club's website.
+
+# Issuing and Verifying the VC
+
+## Proof Options
 
 

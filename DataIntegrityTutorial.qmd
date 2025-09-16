@@ -546,7 +546,7 @@ Note that you may see a number of different formats for the same key information
 }
 ```
 
-### Sharing Public keys: DIDs
+### Sharing Public keys with DIDs
 
 We are going to use a *decentralized identifier* (DID) to identify our club. There can be many "types" of DID and one main way that they are differentiated by their *method*. In short The job of the DID *method* is to resolve a DID into a *DID document* and assure the authenticity of that DID document. From [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-1.0/): "A DID method specification MUST specify how a DID resolver uses a DID to resolve a DID document, including how the DID resolver can verify the ***authenticity*** of the response."
 
