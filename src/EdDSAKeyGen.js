@@ -17,7 +17,7 @@ import {ed25519} from '@noble/curves/ed25519.js';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils.js';
 
 // **You need to furnish this for your club**
-const DID_WEB = "did:web:bawfc.grotto-networking.com";
+const DID_WEB = "did:web:bawfc.grotto-networking.com:signpubkey";
 
 // Public Ed25519 leading bytes: ed01
 // Private Ed25519 leading bytes: 8026

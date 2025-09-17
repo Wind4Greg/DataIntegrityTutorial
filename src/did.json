@@ -1,0 +1,31 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    {
+      "Ed25519VerificationKey2018": "https://w3id.org/security#Ed25519VerificationKey2018",
+      "publicKeyJwk": {
+        "@id": "https://w3id.org/security#publicKeyJwk",
+        "@type": "@json"
+      }
+    }
+  ],
+  "id": "did:web:bawfc.grotto-networking.com",
+  "verificationMethod": [
+    {
+      "id": "did:web:bawfc.grotto-networking.com#key1",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:web:bawfc.grotto-networking.com",
+      "publicKeyJwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "nOd2t8Fe4wEStD1lCCrSr5Evcp3zcHALfkZPt0rKcJg"
+      }
+    }
+  ],
+  "authentication": [
+    "did:web:bawfc.grotto-networking.com#key1"
+  ],
+  "assertionMethod": [
+    "did:web:bawfc.grotto-networking.com#key1"
+  ]
+}

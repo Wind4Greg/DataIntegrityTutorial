@@ -1,7 +1,6 @@
 /*
     Steps to verify a signed verifiable credential in the *DataIntegrityProof*
-    representation with Ed25519 signatures. Run this after DataIntegrityCreate.js
-    or modify to read in a signed file of your choice. Caveat: No error checking
+    representation with Ed25519 signatures. Caveat: No error checking
     is performed.
 */
 import { readFile } from 'fs/promises';

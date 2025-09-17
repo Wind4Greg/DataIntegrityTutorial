@@ -414,6 +414,58 @@ Some references/articles:
 
 **Which cryptosuite and why?**
 
+## Some nginx configurations
+
+Added the following to the `/etc/nginx/mime.types` file
+
+```{.text}
+application/ld+json       		  jsonld;
+```
+
+Added redirects for the context and vocabulary files via nginx rewrite directives in the `/etc/nginx/sites-available/bawfc.grotto-networking.com` file:
+
+```{.text}
+server {
+
+        root /var/www/bawfc.grotto-networking.net/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name bawfc.grotto-networking.com;
+        rewrite ^/cred/foilcontext1$ /cred/windFoilContextV3.jsonld permanent ;
+        rewrite ^/cred/vocab$ /cred/Vocabulary.html permanent ;
+
+	access_log /var/log/nginx/bawfc.access.log;
+	error_log /var/log/nginx/bawfc.error.log;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+
+    listen [::]:443 ssl; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/bawfc.grotto-networking.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/bawfc.grotto-networking.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+server {
+    if ($host = bawfc.grotto-networking.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+        listen 80;
+        listen [::]:80;
+
+        server_name bawfc.grotto-networking.com;
+    return 404; # managed by Certbot
+
+
+}
+```
+
 ## Transfer to Holder via CHAPI
 
 ### Wallets and Such

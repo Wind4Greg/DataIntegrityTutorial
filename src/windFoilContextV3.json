@@ -2,19 +2,19 @@
   "@context": {
     "@protected": true,
     "Member": {
-      "@id": "https://bawfc.grotto-networking.com/cred#Member",
+      "@id": "https://bawfc.grotto-networking.com/cred/vocab#Member",
       "@context": {
         "@protected": true,
         "membership": {
-          "@id": "https://bawfc.grotto-networking.com/cred#membership",
+          "@id": "https://bawfc.grotto-networking.com/cred/vocab#membership",
           "@context": {
             "@protected": true,
             "start": {
-              "@id": "https://bawfc.grotto-networking.com/cred#start",
+              "@id": "https://bawfc.grotto-networking.com/cred/vocab#start",
               "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
             },
             "end": {
-              "@id": "https://bawfc.grotto-networking.com/cred#end",
+              "@id": "https://bawfc.grotto-networking.com/cred/vocab#end",
               "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
             }
           }
@@ -22,17 +22,17 @@
       }
     },
     "WindsurfFoiler": {
-      "@id": "https://bawfc.grotto-networking.com/cred#WindsurfFoiler",
+      "@id": "https://bawfc.grotto-networking.com/cred/vocab#WindsurfFoiler",
       "@context": [
         {
           "knowledge": {
-            "@id": "https://bawfc.grotto-networking.com/cred#knowledge",
+            "@id": "https://bawfc.grotto-networking.com/cred/vocab#knowledge",
             "@container": "@set",
             "@context": {
               "@protected": true,
-              "topic": "https://bawfc.grotto-networking.com/cred#topic",
+              "topic": "https://bawfc.grotto-networking.com/cred/vocab#topic",
               "date": {
-                "@id": "https://bawfc.grotto-networking.com/cred#date",
+                "@id": "https://bawfc.grotto-networking.com/cred/vocab#date",
                 "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
               }
             }
@@ -40,13 +40,13 @@
         },
         {
           "skills": {
-            "@id": "https://bawfc.grotto-networking.com/cred#skills",
+            "@id": "https://bawfc.grotto-networking.com/cred/vocab#skills",
             "@container": "@set",
             "@context": {
               "@protected": true,
-              "skill": "https://bawfc.grotto-networking.com/cred#skill",
+              "skill": "https://bawfc.grotto-networking.com/cred/vocab#skill",
               "date": {
-                "@id": "https://bawfc.grotto-networking.com/cred#date",
+                "@id": "https://bawfc.grotto-networking.com/cred/vocab#date",
                 "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
               }
             }
@@ -54,13 +54,13 @@
         },
         {
           "distanceAchiements": {
-            "@id": "https://bawfc.grotto-networking.com/cred#distanceAchievements",
+            "@id": "https://bawfc.grotto-networking.com/cred/vocab#distanceAchievements",
             "@container": "@set",
             "@context": {
               "@protected": true,
-              "landmark": "https://bawfc.grotto-networking.com/cred#landmark",
+              "landmark": "https://bawfc.grotto-networking.com/cred/vocab#landmark",
               "date": {
-                "@id": "https://bawfc.grotto-networking.com/cred#date",
+                "@id": "https://bawfc.grotto-networking.com/cred/vocab#date",
                 "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
               }
             }

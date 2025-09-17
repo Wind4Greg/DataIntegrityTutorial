@@ -1,5 +1,5 @@
 ---
-title: "VC Data Integrity Slides"
+title: "Implementing Data Integrity for Verifiable Credentials"
 author: "Dr. Greg M. Bernstein"
 format: revealjs
 ---
@@ -354,8 +354,8 @@ What do the *date* fields mean in the credential? What do the *distanceAchieveme
 
 ## Deploy Context and Vocabulary
 
-* Our context resolves to the JSON-LD from the link `https://bawfc.grotto-networking.com/cred/foilcontext1`
-* Our vocabulary resolves from the link: `https://bawfc.grotto-networking.com/cred`
+* Our context resolves to the JSON-LD from the link <https://bawfc.grotto-networking.com/cred/foilcontext1>
+* Our vocabulary resolves from the link: <https://bawfc.grotto-networking.com/cred/vocab>
 * Why spend time writing up a "good" vocabulary document? Other clubs would review this document to understand your credential and to decide whether to accept it for some purpose.
 
 ## Partial Vocabulary Markdown for Club
@@ -570,21 +570,25 @@ With the [`did:key` DID method](https://w3c-ccg.github.io/did-key-spec/) the val
 
 ```{.json}
 {
-  "@context": ["https://www.w3.org/ns/did/v1",
-  "https://w3id.org/security/multikey/v1"],
-  "id": "did:web:bawfc.grotto-networking.com",
-  "assertionMethod": [{
-      "id": "did:web:bawfc.grotto-networking.com#vm",
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/multikey/v1"
+  ],
+  "id": "did:web:bawfc.grotto-networking.com:signpubkey",
+  "assertionMethod": [
+    {
+      "id": "did:web:bawfc.grotto-networking.com:signpubkey#vm",
       "type": "Multikey",
-      "controller": "did:web:bawfc.grotto-networking.com",
-      "publicKeyMultibase": "z6MkisPQbQ4toWkXzY5C1Da76Ghc64DVe5ZU7DkMDjRtvqNj"
-  }]
+      "controller": "did:web:bawfc.grotto-networking.com:signpubkey",
+      "publicKeyMultibase": "z6MkssZC7JGm9aBNsB5VbAWpHAcD3MNFi2anUbNY65g8vXAB"
+    }
+  ]
 }
 ```
 
 ## Resolving with `did:web`
 
-* If our DID is `did:web:bawfc.grotto-networking.com:signpubkey` then the above DID document would be obtain by getting the page: `https://bawfc.grotto-networking.com/signpubkey/did.json`.
+* If our DID is `did:web:bawfc.grotto-networking.com:signpubkey` then the above DID document would be obtain by getting the page: <https://bawfc.grotto-networking.com/signpubkey/did.json>.
 
 * Note that in the resolved URL for the DID document that `https` is used. This implies that the full power of [HTTPS](https://en.wikipedia.org/wiki/HTTPS) guarantees the authenticity of the DID document as comming from our club's website.
 
@@ -630,19 +634,81 @@ With the [`did:key` DID method](https://w3c-ccg.github.io/did-key-spec/) the val
 
 * Unsigned club credential document (**unsigned credential**)
 * Club specific ***context*** document
-* **Proof Options**
+* **Proof Options** (includes *verificationMethod*)
+* Private key
 
 ## Example Proof Options for Club
 
 ```{.json}
 {
-    "TODO": "Put minimal proof option doc here"
+  "proof": {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "eddsa-rdfc-2022",
+    "verificationMethod": "did:key:z6MkfQxm1VBtUV7mAkzEkeM2xFxAb1rhZT5MaJmnkp4f8FDL#z6MkfQxm1VBtUV7mAkzEkeM2xFxAb1rhZT5MaJmnkp4f8FDL",
+    "proofPurpose": "assertionMethod",
+  }
 }
+
 ```
 
 ## Example Signed Club Credential
 
 ```{.json}
 {
-    "TODO": "Put signed credential here."
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://bawfc.grotto-networking.com/cred/foilcontext1"
+  ],
+  "name": "Bay Area Windsurf Foiling Credential",
+  "description": "Denotes membership, knowledge, and skills in windsurf foiling",
+  "type": [
+    "VerifiableCredential",
+    "WindFoilCredential"
+  ],
+  "issuer": {
+    "id": "https://bawfc.grotto-networking.com",
+    "name": "Bay Area Windsurf Foiling Club",
+    "description": "Not a real club, but real information!"
+  },
+  "credentialSubject": {
+    "type": ["Member", "WindsurfFoiler"],
+    "membership": {"start": "2025-03-01T00:00:00Z", "end": "2025-10-31T00:00:00Z"},
+    "knowledge": [
+      {"topic": "DockEtiquette", "date": "1984-01-01T00:00:00Z"},
+      {"topic": "TidesAndCurrents", "date": "2010-01-01T00:00:00Z"},
+      {"topic": "WindPatterns", "date": "2010-01-01T00:00:00Z"},
+      {"topic": "LandMarksBuoys", "date": "2010-01-01T00:00:00Z"},
+      {"topic": "BigBoatsFerries", "date": "2010-01-01T00:00:00Z"}
+    ],
+    "skills": [
+      {"skill": "Rigging", "date": "2010-01-01T00:00:00Z"},
+      {"skill": "FoilSetup", "date": "2017-01-01T00:00:00Z"}
+    ],
+    "distanceAchiements": [
+      {"landmark": "TI", "date": "2010-01-01T00:00:00Z"},
+      {"landmark": "R2", "date": "2011-01-01T00:00:00Z"}
+    ]
+  },
+  "proof": {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "eddsa-rdfc-2022",
+    "verificationMethod": "did:key:z6MkfQxm1VBtUV7mAkzEkeM2xFxAb1rhZT5MaJmnkp4f8FDL#z6MkfQxm1VBtUV7mAkzEkeM2xFxAb1rhZT5MaJmnkp4f8FDL",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "z6gFSUSasdoCMqqHXpHx1bsqg84qp7JEGi5GePxGkJitv3u6jqSMKQhotHpvhUwJZ2mHX3xHVYjgCW7H243RY9Ec"
+  }
 }
+```
+
+## Code Files and Purposes
+
+* `src/EdDSAKeyGen.js`: creates private/public key pair. Puts them into multiple convenient formats in `allKeys.json` file; create `did.json` file with public key for `did:web` method.
+* `src/SignCredential.js`: Define *proof options* in here, uses ``allKeys.json` for private key produces signed credential based on specified input credential.
+* `scr/VerifyCredential.js`: Verifies signed credential. Currently `did:key` verification only.
+* `documentLoader.js`: Loads up local versions of VC DM 2.0 context and our club context.
+
+## Libraries Used
+
+* "@noble/curves": For EdDSA signing and verification
+* "@noble/hashes": For SHA256 and some nice utilities
+* "jsonld": For JSON-LD processing
+* "multiformats": For coding and decoding key formats from/to raw bytes
