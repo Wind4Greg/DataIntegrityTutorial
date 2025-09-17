@@ -590,6 +590,59 @@ With the [`did:key` DID method](https://w3c-ccg.github.io/did-key-spec/) the val
 
 # Issuing and Verifying the VC
 
-## Proof Options
+## Adding a `proof`
 
+* From [VC DM 2.0](https://www.w3.org/TR/vc-data-model-2.0/#credentials) there are two basic approaches to securing a credential.
+* [embedded proofs](https://www.w3.org/TR/vc-data-model-2.0/#dfn-embedded-proof) add an object or array of proof information including cryptographic signature per [VC Data Integrity 1.0](https://www.w3.org/TR/vc-data-integrity) **We will use this**
+* [enveloping proofs](https://www.w3.org/TR/vc-data-model-2.0/#dfn-enveloping-proof) wrap a serialization of the credential.
 
+## What's in a `proof`
+
+<small>Annotated fields based on [VC Data Integrity 1.0](https://www.w3.org/TR/vc-data-integrity)</small>
+
+```{.javascript}
+{
+  "proof": {
+    "id": "whatever...", // Optional
+    "type": "DataIntegrityProof", // Required and this value only
+    "proofPurpose": "assertionMethod", // Required, use this value for a VC
+    // verificationMethod should "point" to the public key for the signature
+    "verificationMethod": "https://di.example/issuer#z6MkjLrk3gKS2nnkeWcmcxiZPGskmesDpuwRBorgHxUXfxnG",
+    "cryptosuite": "eddsa-rdfc-2022", // Required, choose as appropriate
+    "created": "2023-03-05T19:23:24Z", // Optional
+    "expires": "2026-03-05T19:23:24Z", // Optional
+    "domain": "somekind of string", // Optional
+    "challenge": "string that SHOULD be included if a domain is specified", // Optional
+    "proofValue": "encoded cryptographic stuff", // Computed by cryptosuite!!!
+    "previousProof": "id of another proof", // Optional, sets and chains
+    "nonce": "string thingy" // Optional
+  }
+}
+```
+
+## Proof Metadata/Options
+
+* All fields in the `proof` object except ***proofValue*** can be considered either proof metadata or **proof options**.
+* These values are cryptographically **protected** by the cryptosuite, i.e., are inputs to the cryptosuite as well as the unsigned credential.
+* The **proofValue** is an encoding of the output of the underlying signature algorithm applied to both the unsigned credential and proof options.
+
+## Inputs for Club VC Issuance
+
+* Unsigned club credential document (**unsigned credential**)
+* Club specific ***context*** document
+* **Proof Options**
+
+## Example Proof Options for Club
+
+```{.json}
+{
+    "TODO": "Put minimal proof option doc here"
+}
+```
+
+## Example Signed Club Credential
+
+```{.json}
+{
+    "TODO": "Put signed credential here."
+}

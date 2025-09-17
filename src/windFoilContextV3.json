@@ -1,12 +1,12 @@
 {
   "@context": {
-    "protected": true,
+    "@protected": true,
     "Member": {
       "@id": "https://bawfc.grotto-networking.com/cred#Member",
       "@context": {
         "@protected": true,
         "membership": {
-          "@id": "https://bawfc.grotto-networking.com/cred/#membership",
+          "@id": "https://bawfc.grotto-networking.com/cred#membership",
           "@context": {
             "@protected": true,
             "start": {

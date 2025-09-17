@@ -1,7 +1,7 @@
 {
   "@context": [
     "https://www.w3.org/ns/credentials/v2",
-    "https://bawfc.grotto-networking.com/credentials"
+    "https://bawfc.grotto-networking.com/cred/foilcontext1"
   ],
  "name": "Bay Area Windsurf Foiling Credential",
   "description": "Denotes membership, knowledge, and skills in windsurf foiling",
