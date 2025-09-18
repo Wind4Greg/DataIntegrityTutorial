@@ -6,6 +6,13 @@ format: revealjs
 
 # Introduction
 
+## Who Am I
+
+* Greg Bernstein, Website: [Grotto Networking](https://www.grotto-networking.com/)
+* Recent [verifiable credential and cryptography work](https://www.grotto-networking.com/VerifiableCredentials.html)
+* Co-editor of a number of VC Data Integrity documents, and generator of many test vectors
+
+
 ## What's This about?
 
 ::: {.incremental}
