@@ -10,7 +10,7 @@ format: revealjs
 
 ::: {.incremental}
 
-* End to end credential development, issuance, verfification
+* Credential development, issuance, verification
 * Use [VC Data Model 2.0](https://www.w3.org/TR/vc-data-model-2.0), [JSON-LD 1.1](https://www.w3.org/TR/json-ld11) for credential design
 * Use [VC Data Integrity 1.0](https://www.w3.org/TR/vc-data-integrity) and Specific Cryptosuites to secure, issue and verify
 * Use appropriate DIDs for development and deployment
@@ -24,7 +24,7 @@ format: revealjs
 * [VC-DI-EdDSA 1.0](https://www.w3.org/TR/vc-di-eddsa) includes `eddsa-rdfc-2022` and `eddsa-jcs-2022` suites and has simple and enhanced test vectors as well as test vectors for proof sets and chains.
 * [VC-DI-ECDSA 1.0](https://www.w3.org/TR/vc-di-ecdsa) includes `ecdsa-rdfc-2019`, `ecdsa-jcs-2019`, and `ecdsa-sd-2023` over curves P-256 and P-384 and test vectors.
 
-## Beyond Sample Code and Sample Server
+## Beyond Sample Code and Sample Server {.smaller}
 
 * [EdDSA/ECDSA Test Vectors](https://github.com/Wind4Greg/EdDSA-Test-Vectors) Code used to generate the test vectors (example secured credentials) in the [Data Integrity EdDSA Cryptosuites v1.0](https://w3c.github.io/vc-di-eddsa/) and [Data Integrity ECDSA Cryptosuites v1.0](https://w3c.github.io/vc-di-ecdsa/)
 * [ECDSA-SD and BBS Test Vectors](https://github.com/Wind4Greg/ECDSA-SD-TestVectors) Code used to generate the test vectors (example secured credentials) in the [Data Integrity ECDSA selective disclosure](https://w3c.github.io/vc-di-ecdsa/) and [Data Integrity BBS Cryptosuites v1.0](https://w3c.github.io/vc-di-bbs/)
@@ -52,7 +52,7 @@ format: revealjs
 
 ## Cooperating School/Community Clubs Use Case
 
-Suppose that we have two community hiking clubs (purely fictitious): *The Arcata Tall Trees Hiking Club* and the *White Mountain Old Trees Hiking Club* Both clubs exists to promote the "great outdoors", hiking safety, and comraderie.
+Suppose that we have two community hiking clubs: *The Arcata Tall Trees Hiking Club* and the *White Mountain Old Trees Hiking Club* Both clubs exists to promote the "great outdoors", hiking safety, and comraderie.
 
 ::: {layout-ncol=2}
 
@@ -66,16 +66,26 @@ Suppose that we have two community hiking clubs (purely fictitious): *The Arcata
 
 * Students make up their own club to build over a semester. Example: [Bay Area Windsurf Foiling Club](https://bawfc.grotto-networking.com/index.html).
 
-* To make the club interesting from a VC perspective the club should certify knowledge or skills of a member. Clubs can get quite elaborate with loaner equipment for members, events (open to all, open only to members, members paid, etc.), rating system, required volunteer work, etc.
+* To make the club interesting from a VC perspective the club should certify knowledge, skills, or something else about a member. What they choose to certify is up to the club/student.
 * An example of a real club is the [Cal Sailing Club](https://www.cal-sailing.org/), a university club that morphed into a community club.
 
-## Why Bother with Verifiable Credentials?
+## VCs for our Hiking Clubs 1
 
-Hiking club example. Member status. Knowledge certification. Skills certification. Each club has separate member databases which for privacy reasons do not share with the other club. If only a single club then a "hike leader" could check the club database. Other mechanisms could include one club sending email to another or calling the other. These are not as timely as a current credential and sacrifice privacy. "Now we know that he/she is participating with that other club..."
+* Both clubs keep track of their *active* members.
+* Both clubs track members hiking knowledge and skills
+* Both clubs track members hiking accomplishments
+* Both sponsor a number of different hikes of different difficulty levels which require certain knowledge, skills, and accomplishments in order to register.
+
+## VCs for our Hiking Clubs 2
+
+* Clubs would like to allow members to register for some of each others hikes if prerequisites are meet.
+* To preserve members privacy clubs do **NOT** share their member information with each other
+* Instead clubs will issue **verifiable credentials** to their members so members can share this certified information as they desire
+
 
 # Designing the Club's VCs
 
-## How Many Credential
+## How Many Credentials
 
 Consider a wind sport club. It might offer activities in a number of disciplines: (a) dinghy sailing, (b) keel boat sailing, (c) windsurfing, (d) windsurf foiling, (e) wing foiling.
 
@@ -83,16 +93,16 @@ We could have a separate credential for each discipline. Some disciplines may ov
 
 ## Wind Sport Club Categories
 
-1. General Knowledge: Dock etiquet, Tides and Currents, Wind conditions, Boundaries for skill levels.
-2. Sport and Equipment Specific Knowlege: how to assemble and attach a foil
+1. General Knowledge: Dock etiquette, Tides and Currents, Wind conditions, Boundaries for skill levels.
+2. Sport and Equipment Specific Knowledge: how to assemble and attach a foil
 3. Sport Specific Skills: tacking, jibing, getting on foil
-4. Sport Specific Acheivements: round XYZ buoy and returning
+4. Sport Specific Achievements: round XYZ buoy and returning
 
-## Things to Omit in a VC
+## Things to Omit from a VC
 
-Now there are also a number of things a club might need to know about you that do **not** need to be in a credential such as (a) phone number, (b) address, (c) emergency contact information, (d) student status, etc...
+Now there are also a number of things a club might need to know about you that do **not** need to be in a verifiable credential such as (a) your phone number, (b) your address, (c) your emergency contact information, (d) student status, etc...
 
-## Starting Credential VC Data Model 2.0
+## Starting Credential (VC DM 2.0)
 
 ```{.javascript lst-cap="Annotated VC Data Model example."}
 {
@@ -175,7 +185,7 @@ From [JSON-Schema](https://json-schema.org/)
 
 * In addition a JSON-Schema is specified via JSON!
 * I Would teach this in a second web development course for use in data validation. [JSON-Schema Slides](https://www.grotto-networking.com/WebsiteDevelopment/files/lectures/Misc/JSON-Schema.html).
-* I use JSON-Scheme in multiple places in my open source [VC interoperability test server](https://github.com/Wind4Greg/Server-for-VCs).
+* I use JSON-Schema in multiple places in my open source [VC interoperability test server](https://github.com/Wind4Greg/Server-for-VCs).
 
 ## JSON-Schema Example for a VC
 
@@ -699,10 +709,11 @@ With the [`did:key` DID method](https://w3c-ccg.github.io/did-key-spec/) the val
 }
 ```
 
-## Code Files and Purposes
+## Code Files and Purposes {.smaller}
 
-* `src/EdDSAKeyGen.js`: creates private/public key pair. Puts them into multiple convenient formats in `allKeys.json` file; create `did.json` file with public key for `did:web` method.
-* `src/SignCredential.js`: Define *proof options* in here, uses ``allKeys.json` for private key produces signed credential based on specified input credential.
+* All files for this "tutorial" can be found at <https://github.com/Wind4Greg/DataIntegrityTutorial>
+* `src/EdDSAKeyGen.js`: creates private/public key pair. Puts them into multiple convenient formats in `allKeys.json` file; creates the `did.json` file with public key for `did:web` method.
+* `src/SignCredential.js`: Define *proof options* in here, uses ``allKeys.json` for private key, produces signed credential based on specified input credential.
 * `scr/VerifyCredential.js`: Verifies signed credential. Currently `did:key` verification only.
 * `documentLoader.js`: Loads up local versions of VC DM 2.0 context and our club context.
 
